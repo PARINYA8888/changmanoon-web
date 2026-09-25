@@ -812,110 +812,214 @@ input, select, textarea {
  
   <script>
 const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYAVEGxe6q1D5xmBmaQkHbCT3qoAbulWBNv2uFgLKeY6G5wCNqf2-qPwF4RG9NgRQ/exec";
-(function initAppsScriptApi(){
-  let seq=0;
-  const pendingPost=new Map();
 
-  function apiUrl(){
-    return APPS_SCRIPT_WEB_APP_URL;
-  }
+/*
+ * GitHub Pages -> Apps Script bridge
+ *
+ * ไม่ใช้ JSONP / fetch CORS แล้ว
+ * GitHub Pages จะฝัง ApiBridge.html ของ Apps Script แบบ hidden iframe
+ * แล้วสื่อสารด้วย postMessage
+ *
+ * ข้อดี:
+ * - google.script.run ทำงานอยู่ใน HTML Service ของ Apps Script โดยตรง
+ * - รองรับทั้งอ่าน/เขียน/อัปโหลดรูป/PDF
+ * - ไม่ต้องพึ่ง CORS หรือ JSONP
+ * - โค้ดฝั่ง server เดิมไม่ต้องเปลี่ยนวิธีทำงาน
+ */
+(function initAppsScriptBridgeClient(){
+  let seq = 0;
+  let bridgeFrame = null;
+  let bridgeReady = false;
+  let bridgeFailed = false;
+  const queue = [];
+  const pending = new Map();
 
-  function jsonpCall(fn,args,success,failure,userObject){
-    const cbName="__changmanoon_cb_"+Date.now()+"_"+(++seq);
-    const script=document.createElement("script");
-    let finished=false;
-    const cleanup=()=>{
-      if(finished)return;
-      finished=true;
-      try{delete window[cbName];}catch(e){window[cbName]=undefined;}
-      if(script.parentNode)script.parentNode.removeChild(script);
-    };
-    const ok=(payload)=>{
-      cleanup();
-      if(payload && payload.ok===false){
-        const err=new Error(payload.error||"เกิดข้อผิดพลาดจาก Google Apps Script");
-        if(typeof failure==="function")failure(err,userObject);else console.error(err);
-        return;
+  function failPending(message){
+    const error = new Error(message || "เชื่อมต่อ Google Apps Script ไม่สำเร็จ");
+    pending.forEach(item => {
+      if (typeof item.failure === "function") {
+        try { item.failure(error, item.userObject); } catch (e) { setTimeout(() => { throw e; }, 0); }
       }
-      const data = payload && payload.ok===true ? payload.data : payload;
-      if(typeof success==="function"){
-        try{success(data,userObject);}catch(e){setTimeout(()=>{throw e;},0);}
-      }
-    };
-    const fail=(err)=>{
-      cleanup();
-      if(typeof failure==="function")failure(err,userObject);
-      else console.error(err);
-    };
-    window[cbName]=ok;
-    script.onerror=()=>fail(new Error("เชื่อมต่อ Google Apps Script API ไม่สำเร็จ"));
-    const params=new URLSearchParams();
-    params.set("api","1");
-    params.set("fn",fn);
-    params.set("args",JSON.stringify(Array.isArray(args)?args:[]));
-    params.set("prefix",cbName);
-    script.src=apiUrl()+"?"+params.toString();
-    document.head.appendChild(script);
-    setTimeout(()=>{if(!finished)fail(new Error("Google Apps Script API ใช้เวลานานเกินไป"));},30000);
-  }
-
-  function postCall(fn,args,success,failure,userObject){
-    const payload=JSON.stringify({api:"1",fn:fn,args:Array.isArray(args)?args:[]});
-    fetch(apiUrl(),{
-      method:"POST",
-      mode:"no-cors",
-      headers:{"Content-Type":"text/plain;charset=utf-8"},
-      body:payload,
-      keepalive:false
-    }).then(()=>{
-      // POST แบบ no-cors อ่าน response ไม่ได้ แต่ Apps Script จะประมวลผลคำสั่งให้
-      setTimeout(()=>{
-        if(typeof success==="function")success(null,userObject);
-      },1200);
-    }).catch(err=>{
-      if(typeof failure==="function")failure(err,userObject);
-      else console.error(err);
     });
+    pending.clear();
+    while(queue.length){
+      const item = queue.shift();
+      if (typeof item.failure === "function") {
+        try { item.failure(error, item.userObject); } catch (e) { setTimeout(() => { throw e; }, 0); }
+      }
+    }
   }
 
-  function callServer(fn,args,success,failure,userObject){
-    // รูปภาพเป็นข้อมูล base64 ขนาดใหญ่: ส่งผ่าน POST แทน GET/JSONP
-    if(fn==="uploadQuotationImages"||fn==="uploadReceiptImages"){
-      postCall(fn,args,success,failure,userObject);
+  function flushQueue(){
+    if (!bridgeReady || !bridgeFrame || !bridgeFrame.contentWindow) return;
+
+    while(queue.length){
+      const item = queue.shift();
+      pending.set(item.id, item);
+      try {
+        bridgeFrame.contentWindow.postMessage({
+          type: "bridge-call",
+          id: item.id,
+          fn: item.fn,
+          args: item.args
+        }, "*");
+      } catch(err){
+        pending.delete(item.id);
+        if (typeof item.failure === "function") item.failure(err, item.userObject);
+      }
+    }
+  }
+
+  window.addEventListener("message", function(event){
+    if (!event || !event.data) return;
+
+    const msg = event.data;
+
+    if (msg.type === "bridge-ready") {
+      if (!bridgeFrame || event.source !== bridgeFrame.contentWindow) return;
+      bridgeReady = true;
+      bridgeFailed = false;
+      flushQueue();
       return;
     }
-    try{
-      const testUrl=apiUrl()+"?api=1&fn="+encodeURIComponent(fn)+"&args="+encodeURIComponent(JSON.stringify(Array.isArray(args)?args:[]))+"&prefix=x";
-      if(testUrl.length>7000){
-        postCall(fn,args,success,failure,userObject);
-      }else{
-        jsonpCall(fn,args,success,failure,userObject);
+
+    if (msg.type !== "bridge-result" || !msg.id) return;
+    if (!bridgeFrame || event.source !== bridgeFrame.contentWindow) return;
+
+    const item = pending.get(msg.id);
+    if (!item) return;
+    pending.delete(msg.id);
+
+    if (msg.ok) {
+      if (typeof item.success === "function") {
+        try { item.success(msg.data, item.userObject); }
+        catch(e){ setTimeout(() => { throw e; }, 0); }
       }
-    }catch(err){
-      if(typeof failure==="function")failure(err,userObject);
+    } else {
+      const error = new Error(msg.error || "เกิดข้อผิดพลาดจาก Google Apps Script");
+      if (typeof item.failure === "function") {
+        try { item.failure(error, item.userObject); }
+        catch(e){ setTimeout(() => { throw e; }, 0); }
+      }
+    }
+  });
+
+  function ensureBridge(){
+    if (bridgeFrame) return bridgeFrame;
+
+    bridgeFrame = document.createElement("iframe");
+    bridgeFrame.title = "Apps Script API Bridge";
+    bridgeFrame.setAttribute("aria-hidden", "true");
+    bridgeFrame.style.position = "fixed";
+    bridgeFrame.style.width = "1px";
+    bridgeFrame.style.height = "1px";
+    bridgeFrame.style.border = "0";
+    bridgeFrame.style.opacity = "0";
+    bridgeFrame.style.pointerEvents = "none";
+    bridgeFrame.style.left = "-10000px";
+    bridgeFrame.style.top = "-10000px";
+
+    bridgeFrame.onload = function(){
+      if (!bridgeFrame || !bridgeFrame.contentWindow) return;
+
+      // ขอ ready ซ้ำเพื่อรองรับกรณี bridge โหลดเสร็จก่อน listener ของ parent
+      try {
+        bridgeFrame.contentWindow.postMessage({
+          type: "bridge-ping"
+        }, "*");
+      } catch(e){}
+    };
+
+    bridgeFrame.onerror = function(){
+      bridgeFailed = true;
+      failPending("โหลด Apps Script API Bridge ไม่สำเร็จ");
+    };
+
+    bridgeFrame.src = APPS_SCRIPT_WEB_APP_URL + "?bridge=1&_t=" + Date.now();
+    document.body.appendChild(bridgeFrame);
+
+    setTimeout(function(){
+      if (!bridgeReady && !bridgeFailed) {
+        bridgeFailed = true;
+        failPending("เชื่อมต่อ Google Apps Script ใช้เวลานานเกินไป");
+      }
+    }, 30000);
+
+    return bridgeFrame;
+  }
+
+  function callServer(fn, args, success, failure, userObject){
+    const item = {
+      id: "bridge_" + Date.now() + "_" + (++seq),
+      fn: fn,
+      args: Array.isArray(args) ? args : [],
+      success: success,
+      failure: failure,
+      userObject: userObject
+    };
+
+    ensureBridge();
+
+    if (bridgeReady) {
+      pending.set(item.id, item);
+      try {
+        bridgeFrame.contentWindow.postMessage({
+          type: "bridge-call",
+          id: item.id,
+          fn: item.fn,
+          args: item.args
+        }, "*");
+      } catch(err){
+        pending.delete(item.id);
+        if (typeof failure === "function") failure(err, userObject);
+      }
+    } else {
+      queue.push(item);
     }
   }
 
-  function makeRunner(success,failure,userObject){
-    return new Proxy({},{
-      get:function(_target,prop){
-        if(prop==="withSuccessHandler")return function(fn){return makeRunner(fn,failure,userObject);};
-        if(prop==="withFailureHandler")return function(fn){return makeRunner(success,fn,userObject);};
-        if(prop==="withUserObject")return function(obj){return makeRunner(success,failure,obj);};
-        if(typeof prop!=="string")return undefined;
+  function makeRunner(success, failure, userObject){
+    return new Proxy({}, {
+      get: function(_target, prop){
+        if (prop === "withSuccessHandler") {
+          return function(fn){ return makeRunner(fn, failure, userObject); };
+        }
+        if (prop === "withFailureHandler") {
+          return function(fn){ return makeRunner(success, fn, userObject); };
+        }
+        if (prop === "withUserObject") {
+          return function(obj){ return makeRunner(success, failure, obj); };
+        }
+        if (typeof prop !== "string") return undefined;
+
         return function(){
-          callServer(prop,Array.from(arguments),success,failure,userObject);
+          callServer(
+            prop,
+            Array.from(arguments),
+            success,
+            failure,
+            userObject
+          );
         };
       }
     });
   }
 
-  window.google=window.google||{};
-  window.google.script=window.google.script||{};
-  window.google.script.run=makeRunner(null,null,null);
-})();
-  window.google=window.google||{};window.google.script=window.google.script||{};window.google.script.run=makeRunner(null,null);
-  if(document.body)ensureBridge();else document.addEventListener("DOMContentLoaded",ensureBridge,{once:true});
+  window.google = window.google || {};
+  window.google.script = window.google.script || {};
+  window.google.script.run = makeRunner(null, null, null);
+
+  function startBridge(){
+    try {
+      ensureBridge();
+    } catch(err) {
+      bridgeFailed = true;
+      failPending(err.message || "เริ่ม Apps Script API Bridge ไม่สำเร็จ");
+    }
+  }
+
+  if (document.body) startBridge();
+  else document.addEventListener("DOMContentLoaded", startBridge, {once:true});
 })();
 </script>
   <script>
@@ -2719,22 +2823,14 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
       }
 
       box.className = "api-test-result show";
-      box.textContent = "ขั้นที่ 1/2: กำลังตรวจสอบว่า GitHub Pages ติดต่อ Apps Script ได้หรือไม่...";
+      box.textContent = "ขั้นที่ 1/2: กำลังตรวจสอบ GitHub Pages → Apps Script Bridge...";
 
-      const callbackName = "__changmanoon_diagnostic_" + Date.now();
-      const script = document.createElement("script");
       let finished = false;
       const startedAt = Date.now();
-
-      function cleanup() {
-        if (script.parentNode) script.parentNode.removeChild(script);
-        try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
-      }
 
       function finish(ok, message) {
         if (finished) return;
         finished = true;
-        cleanup();
         if (btn) {
           btn.disabled = false;
           btn.textContent = "ทดสอบอีกครั้ง";
@@ -2743,54 +2839,41 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
         box.textContent = message;
       }
 
-      window[callbackName] = function(payload) {
-        const elapsed = Date.now() - startedAt;
+      try {
+        google.script.run
+          .withSuccessHandler(function(data) {
+            const elapsed = Date.now() - startedAt;
+            const count = Array.isArray(data) ? data.length : null;
 
-        if (payload && payload.ok === true) {
-          const data = payload.data;
-          const count = Array.isArray(data) ? data.length : null;
-
-          finish(true,
-            "✅ เชื่อมต่อสำเร็จ\n" +
-            "GitHub Pages → Apps Script: ผ่าน\n" +
-            "Apps Script → Google Sheets: ผ่าน\n" +
-            (count !== null ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n" : "") +
-            "ใช้เวลา: " + elapsed + " ms"
-          );
-          return;
-        }
-
+            finish(true,
+              "✅ เชื่อมต่อสำเร็จ\n" +
+              "GitHub Pages → Apps Script Bridge: ผ่าน\n" +
+              "Apps Script → Google Sheets: ผ่าน\n" +
+              (count !== null ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n" : "") +
+              "ใช้เวลา: " + elapsed + " ms"
+            );
+          })
+          .withFailureHandler(function(err) {
+            const elapsed = Date.now() - startedAt;
+            finish(false,
+              "❌ Bridge ติดต่อ Apps Script ได้ แต่ฟังก์ชันตอบ Error\n" +
+              "รายละเอียด: " + getErrorMessage(err) + "\n" +
+              "ใช้เวลา: " + elapsed + " ms"
+            );
+          })
+          .getCustomers();
+      } catch(err) {
         finish(false,
-          "❌ ติดต่อ Apps Script ได้ แต่ Apps Script ตอบ Error\n" +
-          "รายละเอียด: " + ((payload && payload.error) || "ไม่ทราบสาเหตุ") + "\n" +
-          "ใช้เวลา: " + elapsed + " ms"
+          "❌ เริ่ม Apps Script Bridge ไม่สำเร็จ\n" +
+          "รายละเอียด: " + getErrorMessage(err)
         );
-      };
-
-      script.onerror = function() {
-        finish(false,
-          "❌ ขั้นที่ 1 ไม่ผ่าน\n" +
-          "GitHub Pages ไม่ได้รับคำตอบจาก Apps Script\n" +
-          "จึงยังไม่ถึงขั้นตรวจ Google Sheets"
-        );
-      };
-
-      const params = new URLSearchParams();
-      params.set("api", "1");
-      params.set("fn", "getCustomers");
-      params.set("args", "[]");
-      params.set("prefix", callbackName);
-      params.set("_t", String(Date.now()));
-
-      script.src = APPS_SCRIPT_WEB_APP_URL + "?" + params.toString();
-      document.head.appendChild(script);
+      }
 
       setTimeout(function() {
         if (!finished) {
           finish(false,
-            "❌ ขั้นที่ 1 หมดเวลา 10 วินาที\n" +
-            "GitHub Pages ยังไม่ได้รับ JSONP callback จาก Apps Script\n" +
-            "ตอนนี้จุดที่ต้องตรวจคือการตอบกลับของ Web App/API"
+            "❌ หมดเวลา 10 วินาที\n" +
+            "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script Bridge"
           );
         }
       }, 10000);
