@@ -283,6 +283,20 @@ input, select, textarea {
     .estimate-nav { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
     .estimate-nav.single { grid-template-columns:1fr; }
     .estimate-title { font-size:17px; font-weight:900; color:#172554; margin-bottom:12px; }
+
+    /* API diagnostic panel */
+    .api-test-card { margin: 0 0 14px; padding: 14px; border: 1px solid #bfdbfe; border-radius: 17px; background: linear-gradient(135deg,#eff6ff,#f8fbff); }
+    .api-test-head { display:flex; align-items:center; gap:10px; }
+    .api-test-icon { width:40px; height:40px; flex:0 0 40px; border-radius:12px; display:grid; place-items:center; background:#dbeafe; color:#1d4ed8; }
+    .api-test-icon svg { width:21px; height:21px; fill:none; stroke:currentColor; stroke-width:1.8; }
+    .api-test-title { font-size:14px; font-weight:900; color:#172554; }
+    .api-test-sub { margin-top:2px; color:#64748b; font-size:11px; line-height:1.4; }
+    .api-test-btn { width:100%; min-height:45px; margin-top:11px; border:1px solid #93c5fd; border-radius:12px; background:#ffffff; color:#1d4ed8; font-size:13px; font-weight:900; }
+    .api-test-btn:active { transform:translateY(1px); }
+    .api-test-result { display:none; margin-top:10px; padding:11px 12px; border-radius:12px; font-size:12px; line-height:1.55; white-space:pre-wrap; word-break:break-word; background:#f8fafc; color:#334155; border:1px solid #e2e8f0; }
+    .api-test-result.show { display:block; }
+    .api-test-result.ok { background:#f0fdf4; border-color:#bbf7d0; color:#166534; }
+    .api-test-result.bad { background:#fff1f2; border-color:#fecdd3; color:#991b1b; }
 </style>
 </head>
 <body>
@@ -308,6 +322,20 @@ input, select, textarea {
           <div class="home-title">ระบบจัดการงาน</div>
           <div class="home-desc">จัดการใบเสนอราคา รับเงิน และข้อมูลลูกค้าในที่เดียว</div>
         </div>
+      </div>
+
+      <div class="api-test-card">
+        <div class="api-test-head">
+          <div class="api-test-icon">
+            <svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"></path><path d="M8 10h8"></path><path d="M8 14h5"></path><path d="M7 3v3"></path><path d="M17 3v3"></path></svg>
+          </div>
+          <div>
+            <div class="api-test-title">ตรวจสอบการเชื่อมต่อ Google Sheets</div>
+            <div class="api-test-sub">ทดสอบจาก GitHub Pages → Google Apps Script → Google Sheets โดยตรง</div>
+          </div>
+        </div>
+        <button type="button" class="api-test-btn" onclick="testBackendConnection()">กดเพื่อทดสอบการเชื่อมต่อ</button>
+        <div id="apiTestResult" class="api-test-result"></div>
       </div>
  
       <div class="menu-grid">
@@ -2675,6 +2703,86 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
     function getErrorMessage(err) {
       if (!err) return "เกิดข้อผิดพลาด";
       return typeof err === "string" ? err : (err.message || "เกิดข้อผิดพลาด");
+    }
+
+ 
+    // ทดสอบ API โดยตรงจาก GitHub Pages โดยไม่ผ่าน google.script.run
+    // ใช้ getCustomers เป็น read-only test เพื่อไม่แก้ไขข้อมูลในระบบ
+    function testBackendConnection() {
+      const box = document.getElementById("apiTestResult");
+      const btn = document.querySelector(".api-test-btn");
+      if (!box) return;
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "กำลังทดสอบการเชื่อมต่อ...";
+      }
+      box.className = "api-test-result show";
+      box.textContent = "กำลังติดต่อ Google Apps Script...";
+ 
+      const callbackName = "__changmanoon_diagnostic_" + Date.now();
+      const script = document.createElement("script");
+      let finished = false;
+      const startedAt = Date.now();
+      const cleanup = () => {
+        if (script.parentNode) script.parentNode.removeChild(script);
+        try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
+      };
+      const finish = (ok, message) => {
+        if (finished) return;
+        finished = true;
+        cleanup();
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "ทดสอบอีกครั้ง";
+        }
+        box.className = "api-test-result show " + (ok ? "ok" : "bad");
+        box.textContent = message;
+      };
+ 
+      window[callbackName] = (payload) => {
+        const elapsed = Date.now() - startedAt;
+        if (payload && payload.ok === true) {
+          const data = payload.data;
+          const count = Array.isArray(data) ? data.length : null;
+          finish(true,
+            "✅ เชื่อมต่อสำเร็จ\n" +
+            "GitHub Pages → Apps Script: ผ่าน\n" +
+            "Apps Script → Google Sheets: ผ่าน\n" +
+            (count !== null ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n" : "") +
+            "ใช้เวลา: " + elapsed + " ms"
+          );
+        } else {
+          finish(false,
+            "❌ Apps Script ตอบกลับเป็นข้อผิดพลาด\n" +
+            "รายละเอียด: " + ((payload && payload.error) || "ไม่ทราบสาเหตุ") + "\n" +
+            "ใช้เวลา: " + elapsed + " ms"
+          );
+        }
+      };
+ 
+      script.onerror = () => finish(false,
+        "❌ โหลด API ไม่สำเร็จ\n" +
+        "เบราว์เซอร์ไม่สามารถเรียก Google Apps Script ได้\n" +
+        "URL: " + APPS_SCRIPT_WEB_APP_URL
+      );
+ 
+      const params = new URLSearchParams();
+      params.set("api", "1");
+      params.set("fn", "getCustomers");
+      params.set("args", "[]");
+      params.set("prefix", callbackName);
+      script.src = APPS_SCRIPT_WEB_APP_URL + "?" + params.toString();
+      document.head.appendChild(script);
+ 
+      setTimeout(() => {
+        if (!finished) {
+          finish(false,
+            "❌ หมดเวลารอคำตอบ (15 วินาที)\n" +
+            "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script\n" +
+            "ให้ส่งข้อความนี้กลับมาให้ผมตรวจต่อ"
+          );
+        }
+      }, 15000);
     }
   </script>
 </body>
