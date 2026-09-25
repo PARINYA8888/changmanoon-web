@@ -30,7 +30,7 @@ window.addEventListener("message",function(event){
     reply(event.source,msg.id,false,null,err&&err.message?err.message:err);
   }
 });
-window.parent.postMessage({type:"bridge-ready"},ALLOWED_PARENT_ORIGIN);
+window.parent.postMessage({type:"bridge-ready",origin:location.origin},ALLOWED_PARENT_ORIGIN);
 </script>
 </body>
 </html>
