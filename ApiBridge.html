@@ -4,17 +4,31 @@
 <body>
 <script>
 const ALLOWED_PARENT_ORIGIN="https://parinya8888.github.io";
-const ALLOWED_FUNCTIONS=new Set(["getCustomers","addCustomer","updateCustomer","deleteCustomer","processQuotation","getQuotationHistory","getQuotationRecord","updateQuotationRecord","deleteQuotation","createQuotationPrintPdf","getQuotationImages","uploadQuotationImages","deleteQuotationImage","saveReceiptBatch","getReceiptsData","deleteReceiptRecord","updateReceiptRecord","getReceiptImages","uploadReceiptImages","deleteReceiptImage","calculateMaterialEstimate"]);
-function reply(target,id,ok,data,error){target.postMessage({type:"bridge-result",id,ok,data:ok?data:undefined,error:ok?undefined:String(error||"เกิดข้อผิดพลาดจากเซิร์ฟเวอร์")},ALLOWED_PARENT_ORIGIN);}
+const ALLOWED_FUNCTIONS=new Set([
+  "getCustomers","addCustomer","updateCustomer","deleteCustomer",
+  "processQuotation","getQuotationHistory","getQuotationRecord","updateQuotationRecord","deleteQuotation","createQuotationPrintPdf",
+  "getQuotationImages","uploadQuotationImages","deleteQuotationImage",
+  "saveReceiptBatch","getReceiptsData","deleteReceiptRecord","updateReceiptRecord",
+  "getReceiptImages","uploadReceiptImages","deleteReceiptImage",
+  "calculateMaterialEstimate"
+]);
+function reply(target,id,ok,data,error){
+  target.postMessage({type:"bridge-result",id,ok,data:ok?data:undefined,error:ok?undefined:String(error||"เกิดข้อผิดพลาดจากเซิร์ฟเวอร์")},ALLOWED_PARENT_ORIGIN);
+}
 window.addEventListener("message",function(event){
   if(event.source!==window.parent||event.origin!==ALLOWED_PARENT_ORIGIN)return;
-  const msg=event.data||{}; if(msg.type!=="bridge-call"||!msg.id||!msg.fn)return;
+  const msg=event.data||{};
+  if(msg.type!=="bridge-call"||!msg.id||!msg.fn)return;
   if(!ALLOWED_FUNCTIONS.has(msg.fn)){reply(event.source,msg.id,false,null,"ไม่อนุญาตให้เรียกฟังก์ชันนี้");return;}
   const args=Array.isArray(msg.args)?msg.args:[];
   try{
-    const runner=google.script.run.withSuccessHandler(function(result){reply(event.source,msg.id,true,result,null);}).withFailureHandler(function(err){reply(event.source,msg.id,false,null,err&&err.message?err.message:err);});
+    const runner=google.script.run
+      .withSuccessHandler(function(result){reply(event.source,msg.id,true,result,null);})
+      .withFailureHandler(function(err){reply(event.source,msg.id,false,null,err&&err.message?err.message:err);});
     runner[msg.fn].apply(runner,args);
-  }catch(err){reply(event.source,msg.id,false,null,err&&err.message?err.message:err);}
+  }catch(err){
+    reply(event.source,msg.id,false,null,err&&err.message?err.message:err);
+  }
 });
 window.parent.postMessage({type:"bridge-ready"},ALLOWED_PARENT_ORIGIN);
 </script>
