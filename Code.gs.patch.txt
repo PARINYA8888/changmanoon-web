@@ -64,12 +64,22 @@ function doGet(e) {
   e = e || { parameter: {} };
   var p = e.parameter || {};
 
-  // API สำหรับ GitHub Pages
+  // Bridge สำหรับ GitHub Pages
+  // ให้หน้า GitHub ฝัง HTML Service ของ Apps Script
+  // แล้วเรียก google.script.run ภายใน iframe โดยตรง
+  if (p.bridge === "1") {
+    return HtmlService
+      .createHtmlOutputFromFile("ApiBridge")
+      .setTitle("Apps Script API Bridge")
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+  }
+
+  // API เดิมสำหรับการทดสอบ/ใช้งานโดยตรง
   if (p.api === "1") {
     var fn = String(p.fn || "");
     var prefix = String(p.prefix || "");
 
-    // prefix ใช้กับ JSONP เท่านั้น และต้องเป็น identifier ปกติ
     if (prefix && !/^[A-Za-z_$][0-9A-Za-z_$]*$/.test(prefix)) {
       return apiJson_({ ok:false, error:"invalid callback" }, "");
     }
@@ -79,8 +89,14 @@ function doGet(e) {
       if (p.args) {
         args = JSON.parse(p.args);
       }
+
       var result = apiCallFunction_(fn, args);
-      return apiJson_({ ok:true, data:result }, prefix);
+
+      return apiJson_({
+        ok:true,
+        data:result
+      }, prefix);
+
     } catch (err) {
       return apiJson_({
         ok:false,
@@ -89,7 +105,7 @@ function doGet(e) {
     }
   }
 
-  // ไม่ใช่ API = เปิด Web App เดิมตามปกติ
+  // ไม่ใช่ API/Bridge = เปิด Web App เดิมตามปกติ
   return HtmlService
     .createHtmlOutputFromFile("Index")
     .setTitle("ระบบโรงกลึงช่างมนูญบ่อทอง")
