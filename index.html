@@ -922,7 +922,12 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
     bridgeFrame.onload = function(){
       if (!bridgeFrame || !bridgeFrame.contentWindow) return;
 
-      // ขอ ready ซ้ำเพื่อรองรับกรณี bridge โหลดเสร็จก่อน listener ของ parent
+      // ถือว่า iframe โหลดสำเร็จแล้ว ไม่ต้องรอ bridge-ready
+      // เพราะ postMessage ตัวแรกอาจเกิดก่อน parent listener ของบาง browser
+      bridgeReady = true;
+      bridgeFailed = false;
+      flushQueue();
+
       try {
         bridgeFrame.contentWindow.postMessage({
           type: "bridge-ping"
@@ -932,6 +937,7 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
 
     bridgeFrame.onerror = function(){
       bridgeFailed = true;
+      bridgeReady = false;
       failPending("โหลด Apps Script API Bridge ไม่สำเร็จ");
     };
 
