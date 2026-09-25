@@ -802,8 +802,14 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
       try{delete window[cbName];}catch(e){window[cbName]=undefined;}
       if(script.parentNode)script.parentNode.removeChild(script);
     };
-    const ok=(data)=>{
+    const ok=(payload)=>{
       cleanup();
+      if(payload && payload.ok===false){
+        const err=new Error(payload.error||"เกิดข้อผิดพลาดจาก Google Apps Script");
+        if(typeof failure==="function")failure(err,userObject);else console.error(err);
+        return;
+      }
+      const data = payload && payload.ok===true ? payload.data : payload;
       if(typeof success==="function"){
         try{success(data,userObject);}catch(e){setTimeout(()=>{throw e;},0);}
       }
