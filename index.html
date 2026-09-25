@@ -785,9 +785,9 @@ input, select, textarea {
   <script>
 const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYAVEGxe6q1D5xmBmaQkHbCT3qoAbulWBNv2uFgLKeY6G5wCNqf2-qPwF4RG9NgRQ/exec";
 (function initAppsScriptBridge(){
-  let bridgeFrame=null, bridgeReady=false, requestSeq=0;
+  let bridgeFrame=null, bridgeReady=false, bridgeOriginValue=null, requestSeq=0;
   const pending=new Map();
-  function bridgeOrigin(){try{return new URL(APPS_SCRIPT_WEB_APP_URL).origin;}catch(e){return "*";}}
+  function bridgeOrigin(){return bridgeOriginValue||"*";}
   function ensureBridge(){
     if(bridgeFrame)return bridgeFrame;
     bridgeFrame=document.createElement("iframe");
@@ -802,7 +802,7 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
   window.addEventListener("message",function(event){
     if(!bridgeFrame||event.source!==bridgeFrame.contentWindow)return;
     const msg=event.data||{};
-    if(msg.type==="bridge-ready"){bridgeReady=true;return;}
+    if(msg.type==="bridge-ready"){bridgeOriginValue=event.origin;bridgeReady=true;return;}
     if(msg.type!=="bridge-result"||!msg.id)return;
     const item=pending.get(msg.id); if(!item)return;
     pending.delete(msg.id);
