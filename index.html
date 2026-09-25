@@ -1,1 +1,2625 @@
-The requested file reference is not currently visible. Use files.search or files.list to rediscover the file, then retry with a returned ref_id or file_id.
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0, viewport-fit=cover">
+  <meta name="theme-color" content="#07152f">
+  <!-- รองรับ Android -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <!-- รองรับ iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="ช่างมนูญ">
+  <title>ระบบโรงกลึงช่างมนูญบ่อทอง</title>
+  <style>
+    :root {
+      --navy: #07152f;
+      --blue: #2563eb;
+      --green: #16a34a;
+      --orange: #f97316;
+      --purple: #7c3aed;
+      --rose: #e11d48;
+      --red: #dc2626;
+      --dark: #0f172a;
+      --gray: #64748b;
+      --light: #f1f5f9;
+      --white: #ffffff;
+      --shadow: 0 14px 40px rgba(15, 23, 42, 0.10);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    
+    /* บล็อกการรีโหลดหน้าจอเมื่อดึงลงสุด (Disable Pull-to-Refresh) */
+    html, body { 
+      overscroll-behavior-y: contain; 
+      overscroll-behavior: none;
+      touch-action: pan-x pan-y;
+      margin: 0; 
+      padding: 0; 
+      background: #eef3f9; 
+      color: var(--dark); 
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Thai", Arial, sans-serif; 
+    }
+ 
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+ 
+    /* แก้ปัญหาช่องกรอกข้อมูลล้นกรอบ และกัน iOS ซูมจออัตโนมัติ */
+input, select, textarea {
+    box-sizing: border-box !important;
+    width: 100%;
+    max-width: 100%;
+    -webkit-appearance: none;
+    appearance: none;
+    font-size: 16px !important; 
+}
+ 
+    /* ซ่อนลูกศรขึ้น-ลงในช่องกรอกตัวเลขทุกจุด */
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
+ 
+    .page { width: 100%; max-width: 720px; margin: 0 auto; padding: 0 14px 40px; }
+    .topbar { position: sticky; top: 0; z-index: 100; background: linear-gradient(135deg, #06132b, #0c2350); color: #ffffff; box-shadow: 0 8px 30px rgba(2, 12, 34, 0.28); }
+    .topbar-inner { max-width: 720px; margin: auto; min-height: 72px; padding: 10px 14px; display: flex; align-items: center; gap: 12px; }
+    .brand-icon { width: 44px; height: 44px; flex: 0 0 44px; border-radius: 14px; background: linear-gradient(135deg, #2563eb, #60a5fa); display: grid; place-items: center; }
+    .brand-icon svg { width: 25px; height: 25px; stroke: #ffffff; fill: none; stroke-width: 1.8; }
+    .brand-title { font-size: 16px; font-weight: 800; line-height: 1.2; }
+    .brand-sub { margin-top: 3px; color: #b7c8e5; font-size: 11px; }
+    
+    .view { display: none; padding-top: 18px; }
+    .view.active { display: block !important; }
+ 
+    .section-title { width: 100%; min-height: 58px; border-radius: 17px; padding: 13px 16px; display: flex; align-items: center; gap: 12px; color: #ffffff; margin-bottom: 14px; box-shadow: 0 10px 24px rgba(15, 23, 42, .13); }
+    .section-title.blue { background: linear-gradient(135deg, #155eef, #2563eb, #3b82f6); }
+    .section-title.green { background: linear-gradient(135deg, #15803d, #16a34a, #22c55e); }
+    .section-title.orange { background: linear-gradient(135deg, #ea580c, #f97316, #fb923c); }
+    .section-title.purple { background: linear-gradient(135deg, #6d28d9, #7c3aed, #8b5cf6); }
+    .section-title.rose { background: linear-gradient(135deg, #be123c, #e11d48, #f43f5e); }
+    .section-title.customer { background: linear-gradient(135deg, #0f766e, #0d9488, #14b8a6); }
+    .section-title svg { width: 26px; height: 26px; stroke: #ffffff; fill: none; stroke-width: 1.8; }
+    .section-title-main { font-size: 18px; font-weight: 800; }
+    .section-title-sub { margin-top: 2px; font-size: 11px; opacity: .82; }
+    .home-hero { border-radius: 24px; padding: 24px 20px; margin-bottom: 16px; color: #ffffff; background: linear-gradient(135deg, #06132b 0%, #0d2450 60%, #123b76 100%); box-shadow: 0 18px 50px rgba(7, 21, 47, .24); }
+    .home-kicker { font-size: 11px; letter-spacing: 1.4px; color: #93c5fd; font-weight: 700; text-transform: uppercase; }
+    .home-title { margin: 6px 0 4px; font-size: 25px; font-weight: 900; }
+    .home-desc { color: #c7d7ef; font-size: 13px; }
+    .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .menu-card { position: relative; min-height: 145px; border: none; border-radius: 21px; padding: 18px; text-align: left; color: #ffffff; overflow: hidden; box-shadow: 0 12px 28px rgba(15, 23, 42, .13); }
+    .menu-card.blue { background: linear-gradient(145deg, #1d4ed8, #2563eb, #3b82f6); }
+    .menu-card.green { background: linear-gradient(145deg, #15803d, #16a34a, #22c55e); }
+    .menu-card.orange { background: linear-gradient(145deg, #ea580c, #f97316, #fb923c); }
+    .menu-card.purple { background: linear-gradient(145deg, #6d28d9, #7c3aed, #8b5cf6); }
+    .menu-card.teal { background: linear-gradient(145deg, #0f766e, #0d9488, #14b8a6); }
+    .menu-card.rose { background: linear-gradient(145deg, #be123c, #e11d48, #f43f5e); }
+    .menu-card-icon { width: 46px; height: 46px; border-radius: 15px; background: rgba(255,255,255,.17); display: grid; place-items: center; margin-bottom: 18px; }
+    .menu-card-icon svg { width: 25px; height: 25px; fill: none; stroke: #ffffff; stroke-width: 1.8; }
+    .menu-card-title { font-size: 16px; font-weight: 800; }
+    .menu-card-sub { margin-top: 5px; font-size: 11px; color: rgba(255,255,255,.78); }
+    .menu-arrow { position: absolute; right: 16px; bottom: 16px; width: 28px; height: 28px; border-radius: 10px; background: rgba(255,255,255,.14); display: grid; place-items: center; }
+    .menu-arrow svg { width: 16px; height: 16px; stroke: #ffffff; fill: none; stroke-width: 2; }
+    .card { background: #ffffff; border: 1px solid rgba(203, 213, 225, .82); border-radius: var(--radius); padding: 17px; margin-bottom: 14px; box-shadow: var(--shadow); }
+    .card-head-title { font-size: 15px; font-weight: 800; color: #172554; }
+    .back-btn { width: 100%; height: 44px; margin-bottom: 12px; border: 1px solid #d5deea; background: #ffffff; color: #334155; border-radius: 13px; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 7px; }
+    .back-btn svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    label { display: block; margin: 0 0 7px; color: #334155; font-size: 13px; font-weight: 700; }
+    
+    input, select, textarea { width: 100%; border: 1.5px solid #d3deeb; background: #f8fafc; color: #0f172a; border-radius: 12px; padding: 12px 13px; font-size: 14px; outline: none; margin-bottom: 14px; min-height: 46px; height: 46px; }
+    textarea { resize: none; }
+    input:focus, select:focus, textarea:focus { border-color: #3b82f6; background: #ffffff; box-shadow: 0 0 0 4px rgba(59, 130, 246, .11); }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .field { min-width: 0; }
+    .autocomplete { position: relative; }
+    .suggestions { position: absolute; z-index: 500; left: 0; right: 0; top: calc(100% - 10px); background: #ffffff; border: 1px solid #dbe4ef; border-radius: 13px; box-shadow: 0 18px 40px rgba(15, 23, 42, .18); display: none; max-height: 260px; overflow-y: auto; }
+    .suggestions.show { display: block; }
+    .suggestion-item { width: 100%; border: none; border-bottom: 1px solid #eef2f7; background: #ffffff; padding: 13px 14px; text-align: left; font-size: 14px; min-height: 48px; }
+    .customer-help { margin-top: -7px; margin-bottom: 13px; color: #64748b; font-size: 11px; }
+    .item-card { background: #ffffff; border: 1px solid #d8e4f2; border-left: 5px solid #2563eb; border-radius: 17px; padding: 15px; margin-bottom: 12px; box-shadow: 0 7px 22px rgba(15, 23, 42, .07); }
+    .item-card.receipt { border-left-color: #16a34a; }
+    .item-header { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 40px; padding: 10px 15px; margin: -15px -15px 15px -15px; border-top-left-radius: 12px; border-top-right-radius: 12px; }
+    .item-header.blue-bar { background: #2563eb; color: #ffffff; }
+    .item-header.green-bar { background: #16a34a; color: #ffffff; }
+    .item-number { font-size: 15px; font-weight: 900; color: #ffffff; }
+    .icon-delete { width: 38px; height: 38px; border: 1px solid #dc2626; border-radius: 10px; background: #dc2626; color: #ffffff; display: grid; place-items: center; }
+    .icon-delete svg { width: 18px; height: 18px; stroke: #ffffff; fill: none; stroke-width: 2; }
+    .item-amount { margin: -2px 0 3px; text-align: right; color: #dc2626; font-size: 14px; font-weight: 800; }
+    .btn-add { width: 100%; min-height: 47px; border: none; border-radius: 13px; color: #ffffff; background: linear-gradient(135deg, #15803d, #16a34a); font-size: 14px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 14px; box-shadow: 0 8px 20px rgba(22, 163, 74, .18); }
+    .btn-add svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; }
+    .total-box { background: linear-gradient(135deg, #eff6ff, #f8fbff); border: 1px solid #bfdbfe; border-radius: 16px; padding: 15px; margin: 4px 0 14px; }
+    .total-line { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 30px; color: #475569; font-size: 13px; }
+    .total-line + .total-line { border-top: 1px solid #dbeafe; margin-top: 5px; padding-top: 8px; }
+    .total-main { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-top: 8px; padding-top: 10px; border-top: 1px solid #bfdbfe; }
+    .total-main-label { color: #1e3a8a; font-size: 14px; font-weight: 800; }
+    .total-main-value { color: #1d4ed8; font-size: 21px; font-weight: 900; text-align: right; }
+    .btn-primary { width: 100%; min-height: 52px; border: none; border-radius: 14px; color: #ffffff; background: linear-gradient(135deg, #1d4ed8, #2563eb, #3b82f6); font-size: 15px; font-weight: 900; box-shadow: 0 10px 25px rgba(37, 99, 235, .25); }
+    .btn-primary:disabled { opacity: .55; cursor: not-allowed; }
+    .btn-green { background: linear-gradient(135deg, #15803d, #16a34a); }
+    .search-box { position: relative; margin-bottom: 12px; }
+    .search-box input { padding-left: 43px; margin-bottom: 0; }
+    .search-box svg { position: absolute; left: 14px; top: 14px; width: 18px; height: 18px; stroke: #64748b; fill: none; stroke-width: 1.8; pointer-events: none; }
+    .filter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 10px; }
+    .filter-grid input { margin-bottom: 0; }
+    .history-card { position: relative; background: #ffffff; border: 1px solid #dce5ef; border-radius: 16px; padding: 15px; box-shadow: 0 7px 22px rgba(15, 23, 42, .06); margin-bottom: 12px; }
+    .history-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .history-number { background: #f97316; color: #ffffff; padding: 4px 10px; border-radius: 6px; display: inline-block; font-size: 12px; font-weight: 900; }
+    .history-customer { margin-top: 5px; font-size: 16px; font-weight: 800; color: #0f172a; padding-right: 25px; }
+    .history-meta-bar { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 10px 12px; margin-top: 10px; font-size: 13px; font-weight: 700; gap: 6px; }
+    .meta-item { display: flex; align-items: center; gap: 4px; }
+    .meta-left { color: #c2410c; flex: 1; text-align: left; }
+    .meta-center { color: #15803d; justify-content: center; background: #f0fdf4; padding: 4px 10px; border-radius: 20px; border: 1px solid #bbf7d0; font-weight: 800; }
+    .meta-right { color: #334155; flex: 1; justify-content: flex-end; text-align: right; }
+    .btn-call { display: inline-flex; align-items: center; gap: 5px; background: linear-gradient(135deg, #15803d, #16a34a); color: #ffffff; padding: 7px 12px; border-radius: 10px; font-size: 12px; font-weight: 800; text-decoration: none; box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25); white-space: nowrap; }
+    .btn-call svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.2; }
+    .phone-link { color: #2563eb; font-weight: 800; text-decoration: underline; }
+    .history-total { margin-top: 11px; padding-top: 11px; border-top: 1px solid #edf2f7; display: flex; align-items: center; justify-content: space-between; }
+    .history-total-label { color: #64748b; font-size: 12px; }
+    .history-total-value { color: #1e3a8a; font-size: 18px; font-weight: 900; }
+    .more-wrap { position: relative; flex: 0 0 auto; }
+    .more-btn { width: 36px; height: 36px; border: 1px solid #dce5ef; background: #ffffff; color: #475569; border-radius: 11px; display: grid; place-items: center; font-size: 21px; padding: 0 0 5px; }
+    .more-menu { position: absolute; z-index: 300; top: 42px; right: 0; width: 135px; background: #ffffff; border: 1px solid #dce5ef; border-radius: 13px; box-shadow: 0 18px 40px rgba(15, 23, 42, .18); display: none; overflow: hidden; }
+    .more-menu.show { display: block; }
+    .more-item { width: 100%; min-height: 44px; border: none; border-bottom: 1px solid #eef2f7; background: #ffffff; text-align: left; padding: 0 13px; font-size: 13px; font-weight: 700; color: #334155; }
+    .more-item.delete { color: #dc2626; }
+    .empty { background: #ffffff; border: 1px dashed #cbd5e1; border-radius: 16px; padding: 30px 18px; text-align: center; color: #64748b; font-size: 13px; }
+    .customer-name { font-size: 16px; font-weight: 850; color: #0f172a; }
+    .customer-detail { margin-top: 7px; color: #64748b; font-size: 12px; line-height: 1.6; }
+    .modal { position: fixed; inset: 0; z-index: 3000; display: none; align-items: center; justify-content: center; padding: 18px; background: rgba(2, 8, 23, .62); backdrop-filter: blur(5px); }
+    .modal.show { display: flex; }
+    .modal-box { width: 100%; max-width: 430px; max-height: 90vh; overflow-y: auto; background: #ffffff; border-radius: 21px; padding: 20px; box-shadow: 0 30px 80px rgba(0,0,0,.3); }
+    .modal-icon { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; margin: 0 auto 12px; }
+    .modal-icon.blue { color: #1d4ed8; background: #eff6ff; }
+    .modal-icon.red { color: #dc2626; background: #fff1f2; }
+    .modal-icon.green { color: #15803d; background: #f0fdf4; }
+    .modal-icon svg { width: 25px; height: 25px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .modal-title { margin: 0; text-align: center; font-size: 18px; font-weight: 900; }
+    .modal-text { margin: 7px 0 16px; color: #64748b; text-align: center; font-size: 13px; }
+    .modal-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-top: 4px; }
+    .modal-actions.single { grid-template-columns: 1fr; }
+    .modal-btn { min-height: 47px; border: none; border-radius: 13px; font-size: 13px; font-weight: 800; }
+    .modal-cancel { color: #475569; background: #f1f5f9; }
+    .modal-confirm { color: #ffffff; background: #2563eb; }
+    .modal-confirm.red { background: #dc2626; }
+    .modal-confirm.green { background: #16a34a; }
+    .loading-overlay { position: fixed; inset: 0; z-index: 12000; display: none; align-items: center; justify-content: center; background: rgba(2, 8, 23, .58); backdrop-filter: blur(4px); }
+    .loading-overlay.show { display: flex; }
+    .loading-box { min-width: 220px; padding: 20px; background: #ffffff; border-radius: 18px; text-align: center; }
+    .spinner { width: 38px; height: 38px; margin: 0 auto 12px; border: 4px solid #dbeafe; border-top-color: #2563eb; border-radius: 50%; animation: spin .75s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { color: #334155; font-size: 13px; font-weight: 800; }
+    .toast { position: fixed; z-index: 6000; left: 50%; bottom: 22px; transform: translate(-50%, 20px); width: calc(100% - 30px); max-width: 450px; padding: 13px 15px; border-radius: 14px; color: #ffffff; background: #0f172a; text-align: center; font-size: 13px; font-weight: 700; opacity: 0; pointer-events: none; transition: .2s ease; }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+    .toast.success { background: #15803d; }
+    .toast.error { background: #dc2626; }
+ 
+    .photo-attach-btn { width:100%; min-height:47px; border:1px solid #cbd5e1; border-radius:12px; background:#ffffff; color:#334155; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:7px; margin-top:0; }
+    .photo-attach-btn:hover { background:#eff6ff; border-color:#60a5fa; color:#1d4ed8; }
+    .photo-attach-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+    .receipt-attach-btn { border-color:#bbf7d0; background:#f0fdf4; color:#15803d; }
+    .receipt-attach-btn:hover { background:#dcfce7; border-color:#86efac; color:#15803d; }
+    .receipt-attach-btn .photo-count { color:#15803d; }
+    .photo-count { margin-left:6px; color:#2563eb; }
+    .photo-choice-actions { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; }
+    .photo-choice-btn { min-height:72px; border:1px solid #dbe4ef; border-radius:15px; background:#f8fafc; color:#1e293b; font-weight:800; font-size:13px; }
+    .photo-choice-btn .big-icon { display:none; }
+    #photoViewerModal { z-index: 7000; }
+    #photoChoiceModal { z-index: 8000; }
+    #confirmModal { z-index: 13000; }
+    #successModal { z-index: 4500; }
+    #editReceiptModal { z-index: 4500; }
+    #customerModal { z-index: 4500; }
+    #universalCalendarModal { z-index: 14000; }
+    .photo-viewer-box { max-width:720px; max-height:94vh; padding:14px; }
+    .photo-main-wrap { background:#0f172a; border-radius:15px; min-height:220px; display:flex; align-items:center; justify-content:center; overflow:hidden; touch-action:none; position:relative; overscroll-behavior:contain; }
+    .photo-main { max-width:100%; max-height:58vh; object-fit:contain; display:block; transform-origin:center center; will-change:transform; user-select:none; -webkit-user-drag:none; }
+    .photo-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:7px; margin-top:10px; max-height:180px; overflow-y:auto; }
+    .photo-thumb { aspect-ratio:1/1; border:2px solid transparent; border-radius:10px; padding:0; overflow:hidden; background:#e2e8f0; }
+    .photo-thumb.active { border-color:#2563eb; }
+    .photo-thumb img { width:100%; height:100%; object-fit:cover; display:block; }
+    .photo-tools { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-top:10px; }
+    .photo-tool-btn { min-height:44px; border:none; border-radius:12px; font-size:12px; font-weight:800; background:#eff6ff; color:#1d4ed8; }
+    .photo-tool-btn.danger { background:#fff1f2; color:#dc2626; }
+    .photo-tool-btn.gray { background:#f1f5f9; color:#475569; }
+    .photo-empty { color:#64748b; text-align:center; padding:35px 10px; font-size:13px; }
+    .receipt-payment-row { display:grid; grid-template-columns:1fr 1fr; gap:8px; align-items:end; }
+    .receipt-payment-row .photo-attach-btn { margin-top:0; min-height:46px; height:46px; align-self:end; transform:translateY(-15px); }
+    .receipt-payment-row > div { min-width:0; }
+    .history-actions.single-photo { grid-template-columns:1fr; }
+    .history-actions.pdf-photo { grid-template-columns:1fr 1fr; margin-top:11px; }
+    .history-actions.quotation-actions { grid-template-columns:repeat(2,1fr); margin-top:11px; }
+    @media (max-width: 520px) { .history-actions.quotation-actions { grid-template-columns:1fr; } }
+    .quotation-submit-actions { display:grid; grid-template-columns:1fr 1.45fr; gap:8px; margin-top:10px; }
+    .quotation-attach-btn { min-height:48px; border:1px solid #bfdbfe; background:#eff6ff; color:#1d4ed8; border-radius:13px; font-size:13px; font-weight:800; display:flex; align-items:center; justify-content:center; gap:7px; }
+    .quotation-attach-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2; }
+    .shape-icon { width:42px; height:42px; flex:0 0 42px; display:grid; place-items:center; margin:0; border-radius:12px; background:#f1f5f9; color:#2563eb; }
+    .shape-icon svg { width:30px; height:30px; stroke:currentColor; fill:none; stroke-width:1.8; }
+    .shape-btn.active .shape-icon { background:#dbeafe; color:#1d4ed8; }
+    @media (max-width:520px){ .quotation-submit-actions{grid-template-columns:1fr 1.25fr;} }
+    @media (max-width: 420px) { .receipt-payment-row { grid-template-columns:1fr 1fr; } .receipt-payment-row .photo-attach-btn { font-size:12px; } }
+    .history-actions { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:11px; }
+    .history-action-btn { min-height:44px; border:1px solid #dbe4ef; background:#fff; border-radius:12px; color:#334155; font-size:12px; font-weight:800; }
+ 
+  
+    .date-field-wrap { display:block; position:relative; }
+    .date-field-wrap input { margin-bottom:14px; }
+    .date-field-wrap input[readonly] { cursor:pointer; }
+    .calendar-btn { display:none; }
+    /* ปฏิทินวันที่แบบกำหนดเอง: ไม่พึ่ง input[type=date] / showPicker() */
+    .calendar-native { display:none !important; }
+    .calendar-modal-box { max-width:390px; padding:16px; }
+    .calendar-head { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-bottom:12px; }
+    .calendar-nav { width:42px; height:42px; border:1px solid #dbe4ef; border-radius:12px; background:#f8fafc; color:#334155; font-size:22px; font-weight:800; line-height:1; }
+    .calendar-month-title { flex:1; text-align:center; font-size:17px; font-weight:900; color:#172554; }
+    .calendar-weekdays, .calendar-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:4px; }
+    .calendar-weekday { min-height:30px; display:grid; place-items:center; color:#64748b; font-size:11px; font-weight:800; }
+    .calendar-day { min-height:42px; border:1px solid transparent; border-radius:10px; background:#fff; color:#1e293b; font-size:13px; font-weight:700; }
+    .calendar-day:hover { background:#eff6ff; border-color:#bfdbfe; }
+    .calendar-day.muted { color:#cbd5e1; }
+    .calendar-day.today { border-color:#60a5fa; color:#1d4ed8; font-weight:900; }
+    .calendar-day.selected { background:#2563eb; color:#fff; border-color:#2563eb; font-weight:900; }
+    .calendar-quick { display:grid; grid-template-columns:repeat(3,1fr); gap:7px; margin-top:12px; }
+    .calendar-quick button { min-height:40px; border:1px solid #dbe4ef; border-radius:11px; background:#f8fafc; color:#334155; font-size:11px; font-weight:800; }
+    .calendar-quick button:hover { background:#eff6ff; border-color:#93c5fd; color:#1d4ed8; }
+    .calendar-selected-label { margin:10px 0 0; text-align:center; color:#64748b; font-size:11px; }
+    .estimate-step { display:none; }
+    .estimate-step.active { display:block; }
+    .estimate-selected-shape { margin:-5px 0 14px; padding:10px 12px; border-radius:12px; background:#eff6ff; border:1px solid #bfdbfe; color:#1d4ed8; font-size:13px; font-weight:900; }
+    .shape-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .material-select-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+    .material-select-grid > div { min-width:0; }
+    .shape-btn { background:linear-gradient(180deg,#ffffff,#f8fbff); box-shadow:0 6px 16px rgba(37,99,235,.07); }
+    .shape-btn.active { box-shadow:0 8px 20px rgba(37,99,235,.16); }
+    @media (max-width:520px){ .material-select-grid{grid-template-columns:1fr 1fr;} }
+    .shape-btn { min-height:82px; border:1px solid #dbe4ef; border-radius:15px; background:#fff; font-weight:800; font-size:17px; color:#1e293b; display:flex; align-items:center; justify-content:flex-start; gap:10px; padding:12px 14px; text-align:left; }
+    .shape-btn.active { border-color:#2563eb; background:#eff6ff; color:#1d4ed8; }
+    .estimate-result { background:#eff6ff; border:1px solid #bfdbfe; border-radius:15px; padding:14px; margin-top:12px; }
+    .estimate-result-row { display:flex; justify-content:space-between; gap:10px; padding:6px 0; font-size:13px; }
+    .estimate-result-row strong { font-size:15px; }
+    .estimate-source { color:#64748b; font-size:10px; margin-top:8px; line-height:1.5; }
+    .estimate-nav { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:14px; }
+    .estimate-nav.single { grid-template-columns:1fr; }
+    .estimate-title { font-size:17px; font-weight:900; color:#172554; margin-bottom:12px; }
+</style>
+</head>
+<body>
+ 
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M3 7h18"></path><path d="M5 7l2-4h10l2 4"></path><path d="M5 7v12h14V7"></path><path d="M8 12h8"></path><path d="M8 16h5"></path></svg>
+      </div>
+      <div class="brand">
+        <div class="brand-title">โรงกลึงช่างมนูญบ่อทอง</div>
+        <div class="brand-sub">ระบบจัดการใบเสนอราคา • รับเงิน • ลูกค้า</div>
+      </div>
+    </div>
+  </header>
+ 
+  <main class="page">
+    <!-- HOME -->
+    <section id="homeView" class="view active">
+      <div class="home-hero">
+        <div class="home-hero-content">
+          <div class="home-kicker">WORKSHOP MANAGEMENT</div>
+          <div class="home-title">ระบบจัดการงาน</div>
+          <div class="home-desc">จัดการใบเสนอราคา รับเงิน และข้อมูลลูกค้าในที่เดียว</div>
+        </div>
+      </div>
+ 
+      <div class="menu-grid">
+        <button type="button" class="menu-card blue" onclick="openQuotation()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 12h6"></path><path d="M9 16h6"></path></svg></div>
+          <div class="menu-card-title">สร้างใบเสนอราคา</div>
+          <div class="menu-card-sub">สร้างเอกสารใหม่</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card green" onclick="openReceipt()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"></path><path d="M7 3v6"></path><path d="M17 3v6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg></div>
+          <div class="menu-card-title">รับเงิน</div>
+          <div class="menu-card-sub">บันทึกรายการรับเงิน</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card teal" onclick="openCustomers()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M16 11h6"></path></svg></div>
+          <div class="menu-card-title">ข้อมูลลูกค้า</div>
+          <div class="menu-card-sub">เพิ่ม แก้ไข และค้นหาลูกค้า</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card orange" onclick="openReceiptHistory()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path><path d="M12 7v5l3 2"></path></svg></div>
+          <div class="menu-card-title">ประวัติรับเงิน</div>
+          <div class="menu-card-sub">ดูรายการย้อนหลัง</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card purple" onclick="openQuotationHistory()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg></div>
+          <div class="menu-card-title">ประวัติเสนอราคา</div>
+          <div class="menu-card-sub">ดูและจัดการใบเสนอราคา</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card blue" onclick="openMaterialEstimator()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M4 19h16"></path><path d="M6 17V7h12v10"></path><path d="M9 7V4h6v3"></path><path d="M9 11h6"></path></svg></div>
+          <div class="menu-card-title">ประเมินราคาวัสดุ</div>
+          <div class="menu-card-sub">คำนวณน้ำหนักและต้นทุนวัสดุ</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+ 
+        <button type="button" class="menu-card rose" onclick="openIncomeSummary()">
+          <div class="menu-card-icon"><svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg></div>
+          <div class="menu-card-title">สรุปยอดรายรับ</div>
+          <div class="menu-card-sub">เช็คยอดรวมแต่ละเดือน/ปี</div>
+          <div class="menu-arrow"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"></path></svg></div>
+        </button>
+      </div>
+    </section>
+ 
+    <!-- QUOTATION -->
+    <section id="quotationView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title blue">
+        <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">สร้างใบเสนอราคา</div>
+          <div class="section-title-sub">กรอกข้อมูลแล้วสร้างเอกสาร PDF</div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="card-head-title" style="margin-bottom:10px;">ข้อมูลลูกค้า</div>
+        <label>ชื่อลูกค้า / บริษัท</label>
+        <select id="quotationCustomerSelect" onchange="toggleQuotationOther()">
+          <option value="">-- เลือกลูกค้า --</option>
+          <option value="บริษัท รีไซเคิล เอ็นจิเนียริ่ง จำกัด">บริษัท รีไซเคิล เอ็นจิเนียริ่ง จำกัด</option>
+          <option value="บริษัท ซันเจียง เคมิคอล ไฟเบอร์ (ประเทศไทย) จำกัด">บริษัท ซันเจียง เคมิคอล ไฟเบอร์ (ประเทศไทย) จำกัด</option>
+          <option value="UFM(THAILAND) CO.,LTD.">UFM(THAILAND) CO.,LTD.</option>
+          <option value="สหกรณ์กองทุนสวนยางอำเภอบ่อทอง จำกัด">สหกรณ์กองทุนสวนยางอำเภอบ่อทอง จำกัด</option>
+          <option value="บริษัท เกษตรชล 2559 จำกัด">บริษัท เกษตรชล 2559 จำกัด</option>
+          <option value="บริษัท พนัสแฮชเชอรี่ จำกัด">บริษัท พนัสแฮชเชอรี่ จำกัด</option>
+          <option value="other">ลูกค้าอื่น / พิมพ์ชื่อเอง</option>
+        </select>
+        <input type="text" id="quotationCustomerOther" placeholder="กรอกชื่อลูกค้า..." style="display:none;">
+        <label>วันที่</label>
+        <div class="date-field-wrap"><input type="text" id="quotationDate" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDatePicker('quotationDate')"><input type="date" id="quotationDateNative" class="calendar-native" tabindex="-1" onchange="setDateFromNative('quotationDate',this.value)"></div>
+      </div>
+ 
+      <div id="quotationItems"></div>
+ 
+      <button type="button" class="btn-add" onclick="addQuotationItem()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> เพิ่มรายการ
+      </button>
+ 
+      <div class="card">
+        <label>หมายเหตุ </label>
+        <input type="text" id="quotationRemark" placeholder="หมายเหตุเพิ่มเติม...">
+        <div class="total-box">
+          <div class="total-line"><span>จำนวนรายการทั้งหมด</span><strong id="quotationItemCount">0 รายการ</strong></div>
+          <div class="total-main"><span class="total-main-label">ราคารวมทั้งหมด</span><span class="total-main-value" id="quotationGrandTotal">฿0.00</span></div>
+        </div>
+        <div class="quotation-submit-actions">
+          <button type="button" class="quotation-attach-btn" onclick="openPhotoChoiceForDraftQuotation()">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M15 3h6v6"></path><path d="M10 14l3-3 4 4"></path><circle cx="8.5" cy="8.5" r="1.5"></circle></svg>
+            แนบรูป <span id="quotationPhotoCount">0 รูป</span>
+          </button>
+          <button type="button" class="btn-primary" id="quotationSubmitBtn" onclick="submitQuotation()">สร้างใบเสนอราคา</button>
+        </div>
+      </div>
+    </section>
+ 
+    <!-- RECEIPT -->
+    <section id="receiptView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title green">
+        <svg viewBox="0 0 24 24"><path d="M4 6h16v14H4z"></path><path d="M7 3v6"></path><path d="M17 3v6"></path><path d="M8 13h8"></path><path d="M8 17h5"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">รับเงิน</div>
+          <div class="section-title-sub">บันทึกรายการรับเงิน (ระบุลูกค้าและวันที่ในแต่ละรายการ)</div>
+        </div>
+      </div>
+ 
+      <div id="receiptItems"></div>
+ 
+      <button type="button" class="btn-add" onclick="addReceiptItem()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> เพิ่มรายการรับเงิน
+      </button>
+ 
+      <div class="card">
+        <button type="button" class="btn-primary btn-green" id="receiptSubmitBtn" onclick="submitReceipt()">บันทึกรับเงินทั้งหมด</button>
+      </div>
+    </section>
+ 
+    <!-- RECEIPT HISTORY -->
+    <section id="receiptHistoryView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title orange">
+        <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 4v5h5"></path><path d="M12 7v5l3 2"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">ประวัติรับเงิน</div>
+          <div class="section-title-sub">รายการใหม่สุดอยู่ด้านบน (เรียงลำดับ ID ตามชีต)</div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="filter-grid">
+          <div>
+            <label style="font-size:11px; margin-bottom:3px;">ตั้งแต่</label>
+            <div class="date-field-wrap"><input type="text" id="receiptHistoryStart" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDatePicker('receiptHistoryStart')"><input type="date" id="receiptHistoryStartNative" class="calendar-native" tabindex="-1" onchange="setDateFromNative('receiptHistoryStart',this.value);loadReceiptHistory()"></div>
+          </div>
+          <div>
+            <label style="font-size:11px; margin-bottom:3px;">ถึง</label>
+            <div class="date-field-wrap"><input type="text" id="receiptHistoryEnd" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDatePicker('receiptHistoryEnd')"><input type="date" id="receiptHistoryEndNative" class="calendar-native" tabindex="-1" onchange="setDateFromNative('receiptHistoryEnd',this.value);loadReceiptHistory()"></div>
+          </div>
+        </div>
+        <div class="search-box" style="margin-top:10px;">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+          <input type="text" id="receiptHistorySearch" placeholder="ค้นหาลูกค้า / รายการ..." oninput="renderReceiptHistory()">
+        </div>
+      </div>
+      <div id="receiptHistoryList"></div>
+    </section>
+ 
+    <!-- QUOTATION HISTORY -->
+    <section id="quotationHistoryView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title purple">
+        <svg viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"></path><path d="M15 3v5h5"></path><path d="M9 13h6"></path><path d="M9 17h4"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">ประวัติเสนอราคา</div>
+          <div class="section-title-sub">ใบเสนอราคาใหม่อยู่ด้านบน</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+          <input type="text" id="quotationHistorySearch" placeholder="ค้นหาชื่อลูกค้า / เลขที่..." oninput="renderQuotationHistory()">
+        </div>
+      </div>
+      <div id="quotationHistoryList"></div>
+    </section>
+ 
+    <!-- CUSTOMER DATABASE -->
+    <section id="customersView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title customer">
+        <svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M19 8v6"></path><path d="M16 11h6"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">ข้อมูลลูกค้า</div>
+          <div class="section-title-sub">ฐานข้อมูลลูกค้าของร้าน</div>
+        </div>
+      </div>
+      <button type="button" class="btn-add" style="background:linear-gradient(135deg,#0f766e,#0d9488);" onclick="openAddCustomerModal()">เพิ่มลูกค้า</button>
+      <div class="card">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-4-4"></path></svg>
+          <input type="text" id="customerSearch" placeholder="ค้นหาชื่อลูกค้า..." oninput="renderCustomers()">
+        </div>
+      </div>
+      <div id="customersList"></div>
+    </section>
+ 
+    <!-- MATERIAL ESTIMATOR -->
+    <section id="materialEstimatorView" class="view">
+      <button class="back-btn" type="button" id="materialBackBtn" onclick="materialBack()">ย้อนกลับ</button>
+      <div class="section-title blue">
+        <div class="section-title-text"><div class="section-title-main">ประเมินราคาวัสดุ</div><div class="section-title-sub">คำนวณน้ำหนักและต้นทุนวัสดุสำหรับงานกลึงและงานมิลลิ่ง</div></div>
+      </div>
+      <div class="card estimate-step active" id="estimateStep1">
+        <div class="estimate-title">เลือกรูปทรงชิ้นงาน</div>
+        <div class="shape-grid">
+          <button type="button" class="shape-btn" data-shape="round" onclick="selectMaterialShape('round')"><span class="shape-icon"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12"></circle></svg></span>แท่งกลม</button>
+          <button type="button" class="shape-btn" data-shape="hollow" onclick="selectMaterialShape('hollow')"><span class="shape-icon"><svg viewBox="0 0 40 40"><circle cx="20" cy="20" r="12"></circle><circle cx="20" cy="20" r="5"></circle></svg></span>ทรงกระบอกกลวง</button>
+          <button type="button" class="shape-btn" data-shape="rectangle" onclick="selectMaterialShape('rectangle')"><span class="shape-icon"><svg viewBox="0 0 40 40"><rect x="8" y="12" width="24" height="16" rx="1"></rect></svg></span>แท่งสี่เหลี่ยม</button>
+          <button type="button" class="shape-btn" data-shape="hex" onclick="selectMaterialShape('hex')"><span class="shape-icon"><svg viewBox="0 0 40 40"><path d="M13 10h14l7 10-7 10H13L6 20z"></path></svg></span>ทรงหกเหลี่ยม</button>
+          <button type="button" class="shape-btn" data-shape="box" onclick="selectMaterialShape('box')"><span class="shape-icon"><svg viewBox="0 0 40 40"><path d="M8 13l12-6 12 6-12 6z"></path><path d="M8 13v14l12 6 12-6V13"></path><path d="M20 19v14"></path></svg></span>กล่องสี่เหลี่ยม</button>
+          <button type="button" class="shape-btn" data-shape="plate" onclick="selectMaterialShape('plate')"><span class="shape-icon"><svg viewBox="0 0 40 40"><path d="M8 14h24v12H8z"></path><path d="M12 11h20v3H12z"></path></svg></span>แผ่นเพลท</button>
+        </div>
+      </div>
+      <div class="card estimate-step" id="estimateStep2">
+        <div class="estimate-title">เลือกวัสดุและกรอกขนาด</div>
+        <div id="estimateSelectedShape" class="estimate-selected-shape">รูปทรงที่เลือก: -</div>
+        <div class="material-select-grid">
+          <div><label>ประเภทวัสดุ</label><select id="estimateCategory" onchange="renderEstimateGrades()"></select></div>
+          <div><label>เกรดวัสดุ</label><select id="estimateMaterial" onchange="calculateMaterialEstimateUI()"></select></div>
+        </div>
+        <div id="estimateDimensions"></div>
+        <div class="estimate-result" id="estimateResult">กรอกขนาดเพื่อคำนวณ</div>
+      </div>
+    </section>
+ 
+    <!-- INCOME SUMMARY VIEW -->
+    <section id="incomeSummaryView" class="view">
+      <button class="back-btn" type="button" onclick="goHome()">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5"></path><path d="M12 19l-7-7 7-7"></path></svg> กลับหน้าหลัก
+      </button>
+      <div class="section-title rose">
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        <div class="section-title-text">
+          <div class="section-title-main">สรุปยอดรายรับทั้งหมด</div>
+          <div class="section-title-sub">คำนวณอัตโนมัติรายเดือนและรายปี</div>
+        </div>
+      </div>
+ 
+      <div class="card">
+        <div class="form-row">
+          <div class="field">
+            <label>เลือกเดือน</label>
+            <select id="summaryMonth" onchange="calculateSummary()">
+              <option value="all">ทุกเดือน (ทั้งปี)</option>
+              <option value="01">มกราคม</option>
+              <option value="02">กุมภาพันธ์</option>
+              <option value="03">มีนาคม</option>
+              <option value="04">เมษายน</option>
+              <option value="05">พฤษภาคม</option>
+              <option value="06">มิถุนายน</option>
+              <option value="07">กรกฎาคม</option>
+              <option value="08">สิงหาคม</option>
+              <option value="09">กันยายน</option>
+              <option value="10">ตุลาคม</option>
+              <option value="11">พฤศจิกายน</option>
+              <option value="12">ธันวาคม</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>ปี ค.ศ.</label>
+            <select id="summaryYear" onchange="calculateSummary()"></select>
+          </div>
+        </div>
+ 
+        <div class="total-box" style="background:#fff1f2; border-color:#fecdd3; margin-top:15px;">
+          <div class="total-line"><span>ยอดรวมตามเงื่อนไขที่เลือก</span></div>
+          <div class="total-main">
+            <span class="total-main-label" style="color:#be123c;">รวมรายรับสุทธิ</span>
+            <span class="total-main-value" id="summaryTotalAmount" style="color:#e11d48; font-size:24px;">฿0.00</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+ 
+  <!-- MODALS -->
+  <div id="editReceiptModal" class="modal">
+    <div class="modal-box">
+      <div class="modal-icon green"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"></path></svg></div>
+      <h3 class="modal-title">แก้ไขรายการรับเงิน</h3>
+      <input type="hidden" id="editReceiptRow">
+      <label>ชื่อลูกค้า / บริษัท</label>
+      <div class="autocomplete">
+        <input type="text" id="editReceiptCustomer" autocomplete="off" oninput="filterEditReceiptCustomers()" onfocus="filterEditReceiptCustomers()">
+        <div id="editReceiptSuggestions" class="suggestions"></div>
+      </div>
+      <label>วันที่</label>
+      <div class="date-field-wrap"><input type="text" id="editReceiptDate" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDatePicker('editReceiptDate')"><input type="date" id="editReceiptDateNative" class="calendar-native" tabindex="-1" onchange="setDateFromNative('editReceiptDate',this.value)"></div>
+      <label>รายการ</label>
+      <input type="text" id="editReceiptDesc" placeholder="รายละเอียดงาน / สินค้า...">
+      <div class="form-row">
+        <div class="field"><label>จำนวน</label><input type="number" id="editReceiptQty" min="0" step="any" placeholder="0"></div>
+        <div class="field"><label>หน่วย</label>
+          <select id="editReceiptUnit">
+            <option value="">-- เลือกหน่วย --</option>
+            <option value="ชิ้น">ชิ้น</option><option value="ชุด">ชุด</option><option value="ตัว">ตัว</option><option value="อัน">อัน</option><option value="คลับ">ตลับ</option><option value="รู">รู<option><option value="งาน">งาน</option>
+          </select>
+        </div>
+      </div>
+      <label>จำนวนเงิน (บาท)</label>
+      <input type="number" id="editReceiptAmount" min="0" step="0.01" placeholder="0.00">
+      <label>วิธีชำระเงิน</label>
+      <select id="editReceiptPayment"><option value="เงินสด">เงินสด</option><option value="โอนเงิน">โอนเงิน</option></select>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('editReceiptModal')">ยกเลิก</button>
+        <button type="button" class="modal-btn modal-confirm green" onclick="saveEditedReceipt()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="editQuotationModal" class="modal">
+    <div class="modal-box" style="max-width:720px;">
+      <div class="modal-icon" style="color:#2563eb;background:#eff6ff;"><svg viewBox="0 0 24 24"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4z"></path></svg></div>
+      <h3 class="modal-title">แก้ไขใบเสนอราคา</h3>
+      <input type="hidden" id="editQuotationSheetName">
+      <div class="card" style="box-shadow:none;margin:0 0 12px;padding:14px;">
+        <div class="card-head-title" style="margin-bottom:10px;">ข้อมูลลูกค้า</div>
+        <label>ชื่อลูกค้า / บริษัท</label>
+        <select id="editQuotationCustomerSelect" onchange="toggleEditQuotationOther()">
+          <option value="">-- เลือกลูกค้า --</option>
+          <option value="บริษัท รีไซเคิล เอ็นจิเนียริ่ง จำกัด">บริษัท รีไซเคิล เอ็นจิเนียริ่ง จำกัด</option>
+          <option value="บริษัท ซันเจียง เคมิคอล ไฟเบอร์ (ประเทศไทย) จำกัด">บริษัท ซันเจียง เคมิคอล ไฟเบอร์ (ประเทศไทย) จำกัด</option>
+          <option value="UFM(THAILAND) CO.,LTD.">UFM(THAILAND) CO.,LTD.</option>
+          <option value="สหกรณ์กองทุนสวนยางอำเภอบ่อทอง จำกัด">สหกรณ์กองทุนสวนยางอำเภอบ่อทอง จำกัด</option>
+          <option value="other">ลูกค้าอื่น / พิมพ์ชื่อเอง</option>
+        </select>
+        <input type="text" id="editQuotationCustomerOther" placeholder="กรอกชื่อลูกค้า..." style="display:none;">
+        <label>วันที่</label>
+        <div class="date-field-wrap"><input type="text" id="editQuotationDate" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDatePicker('editQuotationDate')"><input type="date" id="editQuotationDateNative" class="calendar-native" tabindex="-1" onchange="setDateFromNative('editQuotationDate',this.value)"></div>
+      </div>
+ 
+      <div id="editQuotationItems"></div>
+      <button type="button" class="btn-add" onclick="addEditQuotationItem()">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v8"></path><path d="M8 12h8"></path></svg> เพิ่มรายการ
+      </button>
+ 
+      <div class="card" style="box-shadow:none;padding:14px;">
+        <label>หมายเหตุ </label>
+        <input type="text" id="editQuotationRemark" placeholder="หมายเหตุเพิ่มเติม...">
+        <div class="total-box">
+          <div class="total-line"><span>จำนวนรายการทั้งหมด</span><strong id="editQuotationItemCount">0 รายการ</strong></div>
+          <div class="total-main"><span class="total-main-label">ราคารวมทั้งหมด</span><span class="total-main-value" id="editQuotationGrandTotal">฿0.00</span></div>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('editQuotationModal')">ยกเลิก</button>
+        <button type="button" class="modal-btn modal-confirm" style="background:#2563eb;" id="editQuotationSaveBtn" onclick="saveEditedQuotation()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="customerModal" class="modal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="customerModalTitle">เพิ่มลูกค้า</h3>
+      <input type="hidden" id="customerEditRow">
+      <label>ชื่อลูกค้า / บริษัท</label>
+      <input type="text" id="customerNameInput" placeholder="ชื่อลูกค้า">
+      <label>เบอร์โทรศัพท์</label>
+      <input type="text" id="customerPhoneInput" placeholder="เช่น 0812345678">
+      <label>ที่อยู่</label>
+      <input type="text" id="customerAddressInput" placeholder="ที่อยู่">
+      <label>เลขประจำตัวผู้เสียภาษี</label>
+      <input type="text" id="customerTaxInput" placeholder="เลขประจำตัวผู้เสียภาษี">
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('customerModal')">ยกเลิก</button>
+        <button type="button" class="modal-btn modal-confirm" onclick="saveCustomer()">บันทึก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="confirmModal" class="modal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="confirmTitle">ยืนยันการลบ</h3>
+      <p class="modal-text" id="confirmText">คุณต้องการลบรายการนี้หรือไม่?</p>
+      <div class="modal-actions">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('confirmModal')">ยกเลิก</button>
+        <button type="button" class="modal-btn modal-confirm red" id="confirmActionBtn">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="successModal" class="modal">
+    <div class="modal-box">
+      <h3 class="modal-title" id="successModalTitle">สร้างใบเสนอราคาสำเร็จ</h3>
+      <p class="modal-text" id="successModalText">ระบบเตรียมเอกสาร PDF เรียบร้อยแล้ว</p>
+      <div class="modal-actions single">
+        <button type="button" class="modal-btn modal-confirm green" id="openCreatedPdfBtn">เปิดใบเสนอราคา PDF</button>
+        <button type="button" class="modal-btn modal-confirm" id="openCombinedCreatedPdfBtn" style="display:none;">เปิดใบเสนอราคา + รูปภาพ PDF</button>
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('successModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+ 
+ 
+  <div id="quotationPrintModal" class="modal">
+    <div class="modal-box">
+      <h3 class="modal-title">เลือกเอกสาร PDF</h3>
+      <p class="modal-text" id="quotationPrintModalText">เลือกเอกสารที่ต้องการสร้างเป็น PDF</p>
+      <div class="modal-actions single" style="gap:10px;">
+        <button type="button" class="modal-btn modal-confirm" onclick="createQuotationPrint('quotation')">ใบเสนอราคา</button>
+        <button type="button" class="modal-btn modal-confirm" id="quotationPrintImagesBtn" onclick="createQuotationPrint('images')">รูปภาพ</button>
+        <button type="button" class="modal-btn modal-confirm green" id="quotationPrintBothBtn" onclick="createQuotationPrint('both')">ใบเสนอราคา + รูปภาพ</button>
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('quotationPrintModal')">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="photoChoiceModal" class="modal">
+    <div class="modal-box">
+      <h3 class="modal-title">แนบรูปภาพ</h3>
+      <p class="modal-text">เลือกวิธีเพิ่มรูปภาพ</p>
+      <div class="photo-choice-actions">
+        <button type="button" class="photo-choice-btn" onclick="choosePhotoInput('camera')"><span class="big-icon"></span>กล้องถ่ายรูป</button>
+        <button type="button" class="photo-choice-btn" onclick="choosePhotoInput('album')"><span class="big-icon"></span>อัลบัมภาพ</button>
+      </div>
+      <div class="modal-actions single" style="margin-top:10px;">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('photoChoiceModal')">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="photoViewerModal" class="modal">
+    <div class="modal-box photo-viewer-box">
+      <div id="photoViewerContent"></div>
+      <div class="modal-actions single" style="margin-top:10px;">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeModal('photoViewerModal')">ปิด</button>
+      </div>
+    </div>
+  </div>
+ 
+  <input id="cameraInput" type="file" accept="image/*" capture="environment" style="display:none;">
+  <input id="albumInput" type="file" accept="image/*" multiple style="display:none;">
+ 
+  <!-- ปฏิทินวันที่แบบกำหนดเอง -->
+  <div id="universalCalendarModal" class="modal" aria-hidden="true">
+    <div class="modal-box calendar-modal-box">
+      <div class="calendar-head">
+        <button type="button" class="calendar-nav" onclick="calendarChangeMonth(-1)" aria-label="เดือนก่อนหน้า">‹</button>
+        <div id="calendarMonthTitle" class="calendar-month-title"></div>
+        <button type="button" class="calendar-nav" onclick="calendarChangeMonth(1)" aria-label="เดือนถัดไป">›</button>
+      </div>
+      <div class="calendar-weekdays">
+        <div class="calendar-weekday">อา</div><div class="calendar-weekday">จ</div><div class="calendar-weekday">อ</div><div class="calendar-weekday">พ</div><div class="calendar-weekday">พฤ</div><div class="calendar-weekday">ศ</div><div class="calendar-weekday">ส</div>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <div class="calendar-quick">
+        <button type="button" onclick="calendarQuickDate('today')">วันนี้</button>
+        <button type="button" onclick="calendarQuickDate('yesterday')">เมื่อวาน</button>
+        <button type="button" onclick="calendarQuickDate('monthStart')">ต้นเดือน</button>
+      </div>
+      <div id="calendarSelectedLabel" class="calendar-selected-label"></div>
+      <div class="modal-actions single" style="margin-top:10px;">
+        <button type="button" class="modal-btn modal-cancel" onclick="closeUniversalCalendar()">ยกเลิก</button>
+      </div>
+    </div>
+  </div>
+ 
+  <div id="loadingOverlay" class="loading-overlay">
+    <div class="loading-box"><div class="spinner"></div><div class="loading-text" id="loadingText">กำลังประมวลผล...</div></div>
+  </div>
+ 
+  <div id="toast" class="toast"></div>
+ 
+  <script>
+const APPS_SCRIPT_WEB_APP_URL = "PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE";
+(function initAppsScriptBridge(){
+  let bridgeFrame=null, bridgeReady=false, requestSeq=0;
+  const pending=new Map();
+  function bridgeOrigin(){try{return new URL(APPS_SCRIPT_WEB_APP_URL).origin;}catch(e){return "*";}}
+  function ensureBridge(){
+    if(bridgeFrame)return bridgeFrame;
+    bridgeFrame=document.createElement("iframe");
+    bridgeFrame.id="appsScriptBridgeFrame";
+    bridgeFrame.title="Backend bridge";
+    bridgeFrame.setAttribute("aria-hidden","true");
+    bridgeFrame.style.cssText="position:fixed;width:1px;height:1px;left:-10px;bottom:-10px;border:0;opacity:0;pointer-events:none;";
+    document.body.appendChild(bridgeFrame);
+    bridgeFrame.src=APPS_SCRIPT_WEB_APP_URL+(APPS_SCRIPT_WEB_APP_URL.includes("?")?"&":"?")+"bridge=1";
+    return bridgeFrame;
+  }
+  window.addEventListener("message",function(event){
+    if(!bridgeFrame||event.source!==bridgeFrame.contentWindow)return;
+    const msg=event.data||{};
+    if(msg.type==="bridge-ready"){bridgeReady=true;return;}
+    if(msg.type!=="bridge-result"||!msg.id)return;
+    const item=pending.get(msg.id); if(!item)return;
+    pending.delete(msg.id);
+    if(msg.ok){if(typeof item.success==="function")item.success(msg.data);}
+    else{const err=new Error(msg.error||"เกิดข้อผิดพลาดจากเซิร์ฟเวอร์");if(typeof item.failure==="function")item.failure(err);else console.error(err);}
+  });
+  function callServer(fn,args,success,failure){
+    if(!APPS_SCRIPT_WEB_APP_URL||APPS_SCRIPT_WEB_APP_URL.includes("PASTE_YOUR_")){
+      const err=new Error("ยังไม่ได้ตั้งค่า Apps Script Web App URL");if(typeof failure==="function")failure(err);else console.error(err);return;
+    }
+    const frame=ensureBridge(), id="req_"+Date.now()+"_"+(++requestSeq);
+    pending.set(id,{success,failure});
+    const send=function(){try{frame.contentWindow.postMessage({type:"bridge-call",id,fn,args},bridgeOrigin());}catch(err){pending.delete(id);if(typeof failure==="function")failure(err);}};
+    if(bridgeReady)send();else{
+      const started=Date.now();
+      const wait=function(){if(bridgeReady){send();return;}if(Date.now()-started>15000){pending.delete(id);if(typeof failure==="function")failure(new Error("เชื่อมต่อ Google Apps Script ไม่สำเร็จ"));return;}setTimeout(wait,50);};
+      wait();
+    }
+  }
+  function makeRunner(success,failure){return new Proxy({}, {get:function(_target,prop){
+    if(prop==="withSuccessHandler")return function(fn){return makeRunner(fn,failure);};
+    if(prop==="withFailureHandler")return function(fn){return makeRunner(success,fn);};
+    if(prop==="withUserObject")return function(){return makeRunner(success,failure);};
+    if(typeof prop!=="string")return undefined;
+    return function(){callServer(prop,Array.from(arguments),success,failure);};
+  }});}
+  window.google=window.google||{};window.google.script=window.google.script||{};window.google.script.run=makeRunner(null,null);
+  if(document.body)ensureBridge();else document.addEventListener("DOMContentLoaded",ensureBridge,{once:true});
+})();
+</script>
+  <script>
+    let customers = JSON.parse(localStorage.getItem("cache_customers") || "[]");
+    let receiptHistory = JSON.parse(localStorage.getItem("cache_receiptHistory") || "[]");
+    let quotationHistory = JSON.parse(localStorage.getItem("cache_quotationHistory") || "[]");
+    let confirmCallback = null;
+    let currentActiveView = "homeView";
+    let materialEstimator = { shape: "" };
+    let editingQuotationSheetName = null;
+ 
+    const MATERIAL_GROUPS = {
+      steel: [["SS400","เหล็กขาว SS400"],["S45C","เหล็กหัวแดง S45C"],["S50C","เหล็กหัวแดง S50C"],["SCM440","เหล็กหัวฟ้า SCM440"],["S20C","เหล็กหกเหลี่ยม S20C"],["CAST_IRON","เหล็กหล่อ"]],
+      stainless: [["SUS304","สแตนเลส SUS304"],["SUS316","สแตนเลส SUS316"]],
+      nonferrous: [["ALUMINUM","อลูมิเนียม"],["BRASS","ทองเหลือง"],["BRONZE","ทองเหลืองลายเสือ / บรอนซ์"],["COPPER","ทองแดง"]],
+      plastic: [["PTFE","เทฟลอน PTFE"],["UHMWPE","ซุปเปอร์ลีน UHMW-PE"],["MC_NYLON","MC ไนลอน"],["POM","พลาสติก POM"]]
+    };
+    const MATERIAL_SHAPE_ALLOWED = {
+      round:["SS400","S45C","S50C","SCM440","SUS304","SUS316","ALUMINUM","BRASS","BRONZE","COPPER","PTFE","UHMWPE","CAST_IRON","MC_NYLON","POM"],
+      hollow:["SS400","S45C","S50C","SCM440","SUS304","SUS316","ALUMINUM","BRASS","BRONZE","COPPER","PTFE","UHMWPE","CAST_IRON","MC_NYLON","POM"],
+      rectangle:["SS400","S45C","S50C","SCM440","SUS304","SUS316","ALUMINUM","BRASS","PTFE","UHMWPE","MC_NYLON","POM"],
+      hex:["S20C","S45C","SUS304","BRASS","ALUMINUM"],
+      box:["SS400","SUS304","SUS316","ALUMINUM"],
+      plate:["SS400","S45C","SUS304","SUS316","ALUMINUM","BRASS","COPPER","PTFE","UHMWPE","MC_NYLON","POM"]
+    };
+ 
+    // Global Error Handler: กัน Error ของฟังก์ชันหนึ่งลามไปทำให้เมนูอื่นทั้งหมดใช้งานไม่ได้
+    window.addEventListener("error", function(evt) {
+      console.error("Unhandled error:", evt && evt.error ? evt.error : evt.message);
+      try { hideLoading(); } catch (e) {}
+      return false; // ไม่ block พฤติกรรม default ของ browser แต่บันทึก log ไว้ตรวจสอบ
+    });
+    window.addEventListener("unhandledrejection", function(evt) {
+      console.error("Unhandled promise rejection:", evt && evt.reason);
+      try { hideLoading(); } catch (e) {}
+    });
+ 
+    document.addEventListener("DOMContentLoaded", function() {
+      setTodayDate("quotationDate");
+      document.getElementById("receiptHistoryStart").value = "";
+      document.getElementById("receiptHistoryEnd").value = "";
+      resetQuotationForm();
+      resetReceiptForm();
+      
+      loadCustomersSilent();
+ 
+      // ระบบ History Trap สมบูรณ์แบบ ล็อกไม่ให้เด้งออกจากเว็บเด็ดขาด
+      setupBackGuard();
+ 
+      document.addEventListener("click", function(e) {
+        if (!e.target.closest(".autocomplete")) hideAllCustomerSuggestions();
+        if (!e.target.closest(".more-wrap")) closeAllMoreMenus();
+      });
+    });
+ 
+    // Predictable internal navigation stack for mobile Back
+    var backGuardBound=false;
+    var appViewStack=["homeView"];
+    function setupBackGuard(){
+      if(backGuardBound)return;
+      backGuardBound=true;
+      history.replaceState({appRoot:true},"",location.href);
+      history.pushState({appGuard:true},"",location.href);
+      window.addEventListener("popstate",function(){history.pushState({appGuard:true},"",location.href);handleAppBackNavigation();});
+    }
+    function handleAppBackNavigation(){
+      if(document.querySelector(".more-menu.show")){closeAllMoreMenus();return;}
+      if(closeTopModal())return;
+      if(currentActiveView==="materialEstimatorView"&&document.getElementById("estimateStep2")&&document.getElementById("estimateStep2").classList.contains("active")){materialStep(1);return;}
+      if(appViewStack.length>1){appViewStack.pop();renderViewUI(appViewStack[appViewStack.length-1]);}
+    }
+    function switchView(viewId){
+      if(!document.getElementById(viewId))return;
+      if(appViewStack[appViewStack.length-1]!==viewId)appViewStack.push(viewId);
+      renderViewUI(viewId);
+    }
+    function renderViewUI(viewId){
+      currentActiveView=viewId;
+      document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+      const target=document.getElementById(viewId);
+      if(target){target.classList.add("active");window.scrollTo(0,0);}
+    }
+    function goHome(){
+      appViewStack=["homeView"];renderViewUI("homeView");
+      const receiptSearch=document.getElementById("receiptHistorySearch"), quotationSearch=document.getElementById("quotationHistorySearch");
+      if(receiptSearch)receiptSearch.value="";
+      if(quotationSearch)quotationSearch.value="";
+      const receiptStart=document.getElementById("receiptHistoryStart"), receiptEnd=document.getElementById("receiptHistoryEnd");
+      if(receiptStart)receiptStart.value="";
+      if(receiptEnd)receiptEnd.value="";
+      const customerSearch=document.getElementById("customerSearch");
+      if(customerSearch)customerSearch.value="";
+      setTimeout(()=>{[receiptSearch,quotationSearch,customerSearch].forEach(el=>{if(el)el.value="";});},0);
+    }
+
+    function clearTransientSearches() {
+      ["receiptHistorySearch","quotationHistorySearch","customerSearch"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+      ["receiptHistoryStart","receiptHistoryEnd"].forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+      document.querySelectorAll(".receipt-customer").forEach(el => { if (!el.value.trim()) el.value=""; });
+    }
+ 
+    /* ===== Universal Interactive Calendar ===== */
+    let calendarTarget = null;
+    let calendarMonth = new Date();
+ 
+    function openDatePicker(textId) {
+      const text = document.getElementById(textId);
+      if (!text) return;
+      openUniversalCalendar(text, function(iso) {
+        text.value = isoToThaiDate(iso);
+        if (textId === "receiptHistoryStart" || textId === "receiptHistoryEnd") loadReceiptHistory();
+      });
+    }
+ 
+    function setDateFromNative(textId, iso) {
+      /* รองรับโค้ดเดิมไว้ แต่ไม่ใช้ input[type=date] แล้ว */
+      if (iso) { const el=document.getElementById(textId); if(el) el.value=isoToThaiDate(iso); }
+    }
+ 
+    function openDynamicDatePicker(btn) {
+      const text = btn && btn.classList && btn.classList.contains('receipt-date') ? btn : null;
+      if (!text) return;
+      openUniversalCalendar(text, function(iso) { text.value = isoToThaiDate(iso); });
+    }
+ 
+    function setDynamicDateFromNative(native) {
+      /* รองรับโค้ดเดิมไว้ แต่ไม่ใช้ input[type=date] แล้ว */
+      const text = native && native.parentElement ? native.parentElement.querySelector('.receipt-date') : null;
+      if (text && native.value) text.value=isoToThaiDate(native.value);
+    }
+ 
+    function getCalendarDateFromInput(text) {
+      const iso = thaiToIsoDate(text && text.value);
+      if (iso) {
+        const p=iso.split('-').map(Number);
+        return new Date(p[0],p[1]-1,p[2]);
+      }
+      const now=new Date();
+      return new Date(now.getFullYear(),now.getMonth(),now.getDate());
+    }
+ 
+    function openUniversalCalendar(text, onSelect) {
+      calendarTarget = { text:text, onSelect:onSelect };
+      const selected = getCalendarDateFromInput(text);
+      calendarMonth = new Date(selected.getFullYear(), selected.getMonth(), 1);
+      renderUniversalCalendar();
+      const modal=document.getElementById('universalCalendarModal');
+      if(modal){ modal.setAttribute('aria-hidden','false'); }
+      openModal('universalCalendarModal');
+    }
+ 
+    function closeUniversalCalendar() {
+      const modal=document.getElementById('universalCalendarModal');
+      if(modal){ modal.setAttribute('aria-hidden','true'); }
+      closeModal('universalCalendarModal');
+      calendarTarget=null;
+    }
+ 
+    function calendarChangeMonth(delta) {
+      calendarMonth = new Date(calendarMonth.getFullYear(), calendarMonth.getMonth()+delta, 1);
+      renderUniversalCalendar();
+    }
+ 
+    function calendarIso(y,m,d) {
+      return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    }
+ 
+    function renderUniversalCalendar() {
+      const grid=document.getElementById('calendarGrid');
+      const title=document.getElementById('calendarMonthTitle');
+      if(!grid || !title) return;
+      const months=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+      const y=calendarMonth.getFullYear(), m=calendarMonth.getMonth();
+      title.textContent=months[m]+' '+y;
+      grid.innerHTML='';
+      const firstDay=new Date(y,m,1).getDay();
+      const daysInMonth=new Date(y,m+1,0).getDate();
+      const prevDays=new Date(y,m,0).getDate();
+      const selectedIso=calendarTarget && calendarTarget.text ? thaiToIsoDate(calendarTarget.text.value) : '';
+      const todayIso=getTodayYYYYMMDD();
+      const total=Math.ceil((firstDay+daysInMonth)/7)*7;
+      for(let i=0;i<total;i++){
+        let day, yy=y, mm=m, muted=false;
+        if(i<firstDay){ day=prevDays-firstDay+i+1; mm=m-1; muted=true; }
+        else if(i>=firstDay+daysInMonth){ day=i-(firstDay+daysInMonth)+1; mm=m+1; muted=true; }
+        else day=i-firstDay+1;
+        const date=new Date(yy,mm,day);
+        const iso=calendarIso(date.getFullYear(),date.getMonth(),date.getDate());
+        const b=document.createElement('button');
+        b.type='button'; b.className='calendar-day'+(muted?' muted':'')+(iso===todayIso?' today':'')+(iso===selectedIso?' selected':'');
+        b.textContent=day;
+        b.onclick=function(){ selectUniversalCalendarDate(iso); };
+        grid.appendChild(b);
+      }
+      const label=document.getElementById('calendarSelectedLabel');
+      if(label) label.textContent=selectedIso ? 'วันที่เลือก: '+isoToThaiDate(selectedIso) : 'ยังไม่ได้เลือกวันที่';
+    }
+ 
+    function selectUniversalCalendarDate(iso) {
+      if(!calendarTarget) return;
+      if(calendarTarget.text) calendarTarget.text.value=isoToThaiDate(iso);
+      const callback=calendarTarget.onSelect;
+      closeUniversalCalendar();
+      if(typeof callback==='function') callback(iso);
+    }
+ 
+    function calendarQuickDate(type) {
+      const now=new Date();
+      let d=new Date(now.getFullYear(),now.getMonth(),now.getDate());
+      if(type==='yesterday') d.setDate(d.getDate()-1);
+      if(type==='monthStart') d.setDate(1);
+      selectUniversalCalendarDate(calendarIso(d.getFullYear(),d.getMonth(),d.getDate()));
+    }
+ 
+    document.addEventListener('click', function(e){
+      const modal=document.getElementById('universalCalendarModal');
+      if(modal && e.target===modal) closeUniversalCalendar();
+    });
+ 
+    let quotationDraftImages = [];
+ 
+    function openQuotation() { resetQuotationForm(); switchView("quotationView"); }
+    function openReceipt() { resetReceiptForm(); switchView("receiptView"); hideAllCustomerSuggestions(); loadCustomersSilent(); }
+    
+    function openReceiptHistory() {
+      switchView("receiptHistoryView");
+      document.getElementById("receiptHistorySearch").value = "";
+      const startEl=document.getElementById("receiptHistoryStart");
+      const endEl=document.getElementById("receiptHistoryEnd");
+      // เปิดประวัติครั้งแรกต้องดึง "ทุกแถว" จากชีต ไม่ใส่ตัวกรองวันที่อัตโนมัติ
+      // เพื่อไม่ให้รายการเก่าหรือรายการที่แก้ไขวันที่แล้วหายไปหลังโหลดรอบสอง
+      startEl.value="";
+      endEl.value="";
+      renderReceiptHistory();
+      google.script.run.withSuccessHandler(data=>{
+        if(Array.isArray(data)){
+          receiptHistory=data;
+          localStorage.setItem("cache_receiptHistory", JSON.stringify(data));
+          renderReceiptHistory();
+        }
+      }).withFailureHandler(()=>loadReceiptHistorySilent()).getReceiptsData("","");
+    }
+ 
+    function openQuotationHistory() {
+      switchView("quotationHistoryView");
+      document.getElementById("quotationHistorySearch").value = "";
+      renderQuotationHistory();
+      loadQuotationHistorySilent();
+    }
+ 
+    function openCustomers() { 
+      switchView("customersView"); 
+      const cs=document.getElementById("customerSearch"); if(cs) cs.value="";
+      renderCustomers(); 
+      loadCustomersSilent(); 
+    }
+ 
+    function getTodayYYYYMMDD() {
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return yyyy + "-" + mm + "-" + dd;
+    }
+ 
+    function isoToThaiDate(iso) {
+      const parts = String(iso || "").split("-");
+      if (parts.length !== 3) return String(iso || "");
+      return parts[2] + "/" + parts[1] + "/" + parts[0];
+    }
+ 
+    function thaiToIsoDate(value) {
+      const s = String(value || "").trim();
+      let m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+      if (m) return m[3] + "-" + String(m[2]).padStart(2,"0") + "-" + String(m[1]).padStart(2,"0");
+      m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+      if (m) return m[1] + "-" + String(m[2]).padStart(2,"0") + "-" + String(m[3]).padStart(2,"0");
+      return "";
+    }
+ 
+    function normalizeThaiDateInput(el) {
+      if (!el) return;
+      const iso = thaiToIsoDate(el.value);
+      if (iso) el.value = isoToThaiDate(iso);
+    }
+ 
+    function setTodayDate(id) {
+      const el = document.getElementById(id);
+      if (el && !el.value) el.value = isoToThaiDate(getTodayYYYYMMDD());
+    }
+ 
+    function toggleQuotationOther() {
+      const select = document.getElementById("quotationCustomerSelect");
+      const other = document.getElementById("quotationCustomerOther");
+      if (select.value === "other") {
+        other.style.display = "block";
+        other.focus();
+      } else {
+        other.style.display = "none";
+        other.value = "";
+      }
+    }
+ 
+    function resetQuotationForm() {
+      document.getElementById("quotationCustomerSelect").value = "";
+      const other = document.getElementById("quotationCustomerOther");
+      other.value = "";
+      other.style.display = "none";
+      document.getElementById("quotationRemark").value = "";
+      document.getElementById("quotationItems").innerHTML = "";
+      quotationDraftImages = [];
+      updateQuotationPhotoCount();
+      addQuotationItem();
+      setTodayDate("quotationDate");
+      calculateQuotationGrandTotal();
+    }
+ 
+    function addQuotationItem() {
+      const container = document.getElementById("quotationItems");
+      const index = container.children.length + 1;
+      const card = document.createElement("div");
+      card.className = "item-card";
+      
+      card.innerHTML = `
+        <div class="item-header blue-bar">
+          <div class="item-number">รายการที่ ${index}</div>
+          ${index > 1 ? `<button type="button" class="icon-delete" onclick="removeQuotationItem(this)" title="ลบรายการ"><svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg></button>` : ""}
+        </div>
+        <label>ชื่อรายการ</label>
+        <input type="text" class="quotation-desc" placeholder="รายละเอียดสินค้า / งาน...">
+        <div class="form-row">
+          <div class="field"><label>จำนวน</label><input type="number" class="quotation-qty" min="0" step="any" placeholder="0" oninput="calculateQuotationItem(this)"></div>
+          <div class="field"><label>หน่วย</label>
+            <select class="quotation-unit">
+              <option value="">-- เลือกหน่วย --</option><option value="ชุด">ชุด</option><option value="ตัว">ตัว</option><option value="ชิ้น">ชิ้น</option><option value="อัน">อัน</option><option value="ตลับ">ตลับ</option><option value="รู">รู</option><option value="งาน">งาน</option>
+            </select>
+          </div>
+        </div>
+        <label>ราคาต่อหน่วย (บาท)</label>
+        <input type="number" class="quotation-price" min="0" step="0.01" placeholder="0.00" oninput="calculateQuotationItem(this)">
+        <div class="item-amount">รวมเป็นเงิน: <span class="quotation-item-amount">฿0.00</span></div>
+      `;
+      container.appendChild(card);
+      updateQuotationIndexes();
+      calculateQuotationGrandTotal();
+    }
+ 
+    function removeQuotationItem(btn) {
+      btn.closest(".item-card").remove();
+      updateQuotationIndexes();
+      calculateQuotationGrandTotal();
+    }
+ 
+    function updateQuotationIndexes() {
+      document.querySelectorAll("#quotationItems .item-card").forEach((card, index) => {
+        card.querySelector(".item-number").textContent = "รายการที่ " + (index + 1);
+        const header = card.querySelector(".item-header");
+        const oldDel = header.querySelector(".icon-delete");
+        if (index === 0 && oldDel) oldDel.remove();
+        if (index > 0 && !oldDel) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "icon-delete";
+          btn.onclick = function() { removeQuotationItem(btn); };
+          btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg>`;
+          header.appendChild(btn);
+        }
+      });
+    }
+ 
+    function calculateQuotationItem(el) {
+      const card = el.closest(".item-card");
+      const qty = parseFloat(card.querySelector(".quotation-qty").value) || 0;
+      const price = parseFloat(card.querySelector(".quotation-price").value) || 0;
+      card.querySelector(".quotation-item-amount").textContent = formatMoney(qty * price);
+      calculateQuotationGrandTotal();
+    }
+ 
+    function calculateQuotationGrandTotal() {
+      let total = 0, count = 0;
+      document.querySelectorAll("#quotationItems .item-card").forEach(card => {
+        const qty = parseFloat(card.querySelector(".quotation-qty").value) || 0;
+        const price = parseFloat(card.querySelector(".quotation-price").value) || 0;
+        const desc = card.querySelector(".quotation-desc").value.trim();
+        if (desc || qty || price) count++;
+        total += qty * price;
+      });
+      document.getElementById("quotationItemCount").textContent = count + " รายการ";
+      document.getElementById("quotationGrandTotal").textContent = formatMoney(total);
+    }
+ 
+    function getQuotationCustomerName() {
+      const select = document.getElementById("quotationCustomerSelect");
+      if (select.value === "other") return document.getElementById("quotationCustomerOther").value.trim();
+      return select.value.trim();
+    }
+ 
+    function submitQuotation() {
+      const customerName = getQuotationCustomerName();
+      if (!customerName) { showToast("กรุณาระบุชื่อลูกค้า", "error"); return; }
+      const dateInput = document.getElementById("quotationDate");
+      normalizeThaiDateInput(dateInput);
+      const date = thaiToIsoDate(dateInput.value);
+      if (!date) { showToast("กรุณาระบุวันที่ให้ถูกต้องในรูปแบบ dd/mm/yyyy", "error"); return; }
+ 
+      const cards = document.querySelectorAll("#quotationItems .item-card");
+      let items = [], valid = true;
+      cards.forEach(card => {
+        const desc = card.querySelector(".quotation-desc").value.trim();
+        const qty = card.querySelector(".quotation-qty").value.trim();
+        const unit = card.querySelector(".quotation-unit").value.trim();
+        const price = card.querySelector(".quotation-price").value.trim();
+        if (!desc || !qty || !unit || !price) valid = false;
+        items.push({ desc, qty: parseFloat(qty), unit, price: parseFloat(price) });
+      });
+ 
+      if (!valid) { showToast("กรุณากรอกข้อมูลรายการ ชื่อ, จำนวน, หน่วย และราคาให้ครบทุกช่อง", "error"); return; }
+ 
+      const remark = document.getElementById("quotationRemark").value.trim();
+      const btn = document.getElementById("quotationSubmitBtn");
+      btn.disabled = true;
+      showLoading("กำลังสร้างใบเสนอราคา...");
+ 
+      google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        btn.disabled = false;
+        document.getElementById("successModalTitle").textContent = "สร้างใบเสนอราคาสำเร็จ";
+        document.getElementById("successModalText").textContent = "ระบบสร้างเอกสาร PDF เรียบร้อยแล้ว";
+        document.getElementById("openCreatedPdfBtn").textContent = "เปิดใบเสนอราคา PDF";
+        document.getElementById("openCreatedPdfBtn").onclick = () => { window.open(res.pdfUrl, "_blank"); closeModal("successModal"); };
+        const combinedBtn = document.getElementById("openCombinedCreatedPdfBtn");
+        if (combinedBtn) {
+          if (res.combinedPdfUrl) { combinedBtn.style.display = "block"; combinedBtn.onclick = () => { window.open(res.combinedPdfUrl, "_blank"); closeModal("successModal"); }; }
+          else combinedBtn.style.display = "none";
+        }
+        resetQuotationForm();
+        openModal("successModal");
+      }).withFailureHandler(err => {
+        hideLoading();
+        btn.disabled = false;
+        showToast(getErrorMessage(err), "error");
+      }).processQuotation({ customerName, date, remark, items, images: quotationDraftImages });
+    }
+ 
+    function loadCustomersSilent() {
+      google.script.run.withSuccessHandler(data => {
+        if (Array.isArray(data)) {
+          customers = data;
+          localStorage.setItem("cache_customers", JSON.stringify(data));
+          renderCustomers();
+        }
+      }).getCustomers();
+    }
+ 
+    function filterReceiptCustomers(inputEl, boxEl) {
+      const kw = inputEl.value.trim().toLowerCase();
+      if (!kw) {
+        if (boxEl) { boxEl.innerHTML = ""; boxEl.classList.remove("show"); }
+        return;
+      }
+      const list = customers.filter(c => c.name.toLowerCase().includes(kw));
+      renderCustomerSuggestions(boxEl, list, inputEl);
+    }
+ 
+    function renderCustomerSuggestions(box, list, inputEl) {
+      if (!box) return;
+      box.innerHTML = "";
+      if (!list || list.length === 0) {
+        box.classList.remove("show");
+        return;
+      }
+      list.slice(0, 10).forEach(c => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "suggestion-item";
+        btn.textContent = c.name;
+        btn.onclick = (e) => {
+          e.preventDefault();
+          inputEl.value = c.name;
+          box.classList.remove("show");
+        };
+        box.appendChild(btn);
+      });
+      box.classList.add("show");
+    }
+ 
+    function hideAllCustomerSuggestions() {
+      document.querySelectorAll(".suggestions").forEach(b => b.classList.remove("show"));
+    }
+ 
+    function resetReceiptForm() {
+      document.getElementById("receiptItems").innerHTML = "";
+      addReceiptItem();
+    }
+ 
+    function addReceiptItem() {
+      const container = document.getElementById("receiptItems");
+      const index = container.children.length + 1;
+      const card = document.createElement("div");
+      card.className = "item-card receipt";
+      
+      card.innerHTML = `
+        <div class="item-header green-bar">
+          <div class="item-number">รายการรับเงินที่ ${index}</div>
+          ${index > 1 ? `<button type="button" class="icon-delete" onclick="removeReceiptItem(this)" title="ลบรายการ"><svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg></button>` : ""}
+        </div>
+        <label>ชื่อลูกค้า / บริษัท</label>
+        <div class="autocomplete">
+          <input type="text" class="receipt-customer" autocomplete="off" placeholder="พิมพ์ชื่อลูกค้า..." oninput="filterReceiptCustomers(this, this.nextElementSibling)" onfocus="filterReceiptCustomers(this, this.nextElementSibling)">
+          <div class="suggestions"></div>
+        </div>
+        <div class="customer-help">พิมพ์บางส่วนเพื่อค้นหาจากฐานข้อมูลลูกค้า หรือพิมพ์ชื่อใหม่เองได้</div>
+        <label>วันที่</label>
+        <div class="date-field-wrap"><input type="text" class="receipt-date" readonly inputmode="none" placeholder="เลือกวันที่" autocomplete="off" onclick="openDynamicDatePicker(this)"><input type="date" class="calendar-native receipt-date-native" tabindex="-1" onchange="setDynamicDateFromNative(this)"></div>
+        <label>รายการ</label>
+        <input type="text" class="receipt-desc" placeholder="รายละเอียดงาน / สินค้า...">
+        <div class="form-row">
+          <div class="field"><label>จำนวน</label><input type="number" class="receipt-qty" min="0" step="any" placeholder="0"></div>
+          <div class="field"><label>หน่วย</label>
+            <select class="receipt-unit">
+              <option value="">-- เลือกหน่วย --</option><option value="ชิ้น">ชิ้น</option><option value="ชุด">ชุด</option><option value="ตัว">ตัว</option><option value="อัน">อัน</option><option value="ตลับ">ตลับ</option><option value="รู">รู</option><option value="งาน">งาน</option>
+            </select>
+          </div>
+        </div>
+        <label>จำนวนเงิน (บาท)</label>
+        <input type="number" class="receipt-amount" min="0" step="0.01" placeholder="0.00">
+        <div class="receipt-payment-row">
+          <div>
+            <label>วิธีชำระเงิน</label>
+            <select class="receipt-payment"><option value="เงินสด">เงินสด</option><option value="โอนเงิน">โอนเงิน</option></select>
+          </div>
+          <button type="button" class="photo-attach-btn receipt-attach-btn" onclick="openPhotoChoiceForDraftReceipt(this)">
+            <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="M15 3h6v6"></path><path d="M10 14l3-3 4 4"></path><circle cx="8.5" cy="8.5" r="1.5"></circle></svg>
+            แนบรูป <span class="photo-count">0 รูป</span>
+          </button>
+        </div>
+      `;
+      container.appendChild(card);
+      card.querySelector(".receipt-date").value = isoToThaiDate(getTodayYYYYMMDD());
+      updateReceiptIndexes();
+    }
+ 
+    function removeReceiptItem(btn) {
+      btn.closest(".item-card").remove();
+      updateReceiptIndexes();
+    }
+ 
+    function updateReceiptIndexes() {
+      document.querySelectorAll("#receiptItems .item-card").forEach((card, index) => {
+        card.querySelector(".item-number").textContent = "รายการรับเงินที่ " + (index + 1);
+        const header = card.querySelector(".item-header");
+        const oldDel = header.querySelector(".icon-delete");
+        if (index === 0 && oldDel) oldDel.remove();
+        if (index > 0 && !oldDel) {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "icon-delete";
+          btn.onclick = function() { removeReceiptItem(btn); };
+          btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg>`;
+          header.appendChild(btn);
+        }
+      });
+    }
+ 
+    async function submitReceipt() {
+      const cards = document.querySelectorAll("#receiptItems .item-card");
+      let items = [];
+      let valid = true;
+ 
+      cards.forEach((card) => {
+        const customer = card.querySelector(".receipt-customer").value.trim();
+        const dateEl = card.querySelector(".receipt-date");
+        normalizeThaiDateInput(dateEl);
+        const date = thaiToIsoDate(dateEl.value);
+        const desc = card.querySelector(".receipt-desc").value.trim();
+        const qtyVal = card.querySelector(".receipt-qty").value.trim();
+        const unit = card.querySelector(".receipt-unit").value.trim();
+        const amountVal = card.querySelector(".receipt-amount").value.trim();
+        const payment = card.querySelector(".receipt-payment").value;
+        const qty = parseFloat(qtyVal);
+        const amount = parseFloat(amountVal);
+        if (!customer || !date || !desc || !qtyVal || isNaN(qty) || !unit || !amountVal || isNaN(amount) || !payment) valid = false;
+        items.push({
+          date, customerName: customer, itemDesc: desc, qty, unit, amount, paymentMethod: payment,
+          images: Array.isArray(card._images) ? card._images : []
+        });
+      });
+ 
+      if (!valid) {
+        showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง (ชื่อลูกค้า, วันที่, รายการ, จำนวน, หน่วย และจำนวนเงิน)", "error");
+        return;
+      }
+ 
+      const btn = document.getElementById("receiptSubmitBtn");
+      btn.disabled = true;
+      showLoading("กำลังบันทึกรับเงินและรูปภาพ...");
+ 
+      google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        btn.disabled = false;
+        showToast(res.message || "บันทึกรับเงินเรียบร้อย", "success");
+        resetReceiptForm();
+        goHome();
+      }).withFailureHandler(err => {
+        hideLoading();
+        btn.disabled = false;
+        showToast(getErrorMessage(err), "error");
+      }).saveReceiptBatch(items);
+    }
+ 
+    function loadReceiptHistorySilent() {
+      const startEl = document.getElementById("receiptHistoryStart");
+      const endEl = document.getElementById("receiptHistoryEnd");
+      normalizeThaiDateInput(startEl);
+      normalizeThaiDateInput(endEl);
+      const start = thaiToIsoDate(startEl.value);
+      const end = thaiToIsoDate(endEl.value);
+ 
+      google.script.run.withSuccessHandler(data => {
+        if (Array.isArray(data)) {
+          receiptHistory = data;
+          localStorage.setItem("cache_receiptHistory", JSON.stringify(data));
+          renderReceiptHistory();
+        }
+      }).getReceiptsData(start, end);
+    }
+ 
+    function loadReceiptHistory() {
+      loadReceiptHistorySilent();
+    }
+ 
+    function renderReceiptHistory() {
+      const container = document.getElementById("receiptHistoryList");
+      const search = document.getElementById("receiptHistorySearch").value.trim().toLowerCase();
+      let list = search ? receiptHistory.filter(item => [item.customerName, item.itemDesc, item.paymentMethod].join(" ").toLowerCase().includes(search)) : receiptHistory;
+ 
+      container.innerHTML = "";
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty"><div>ไม่พบประวัติรับเงิน</div></div>`;
+        return;
+      }
+ 
+      list.forEach((item) => {
+        const card = document.createElement("div");
+        card.className = "history-card";
+        card.innerHTML = `
+          <div class="history-top">
+            <div>
+              <div class="history-number">ลำดับที่ ${item.id}</div>
+              <div class="history-customer">${escapeHtml(item.customerName)}</div>
+            </div>
+            <div class="more-wrap">
+              <button type="button" class="more-btn" onclick="toggleMoreMenu(this)">⋮</button>
+              <div class="more-menu">
+                <button type="button" class="more-item" onclick="openEditReceipt(${item.rowIndex})">แก้ไข</button>
+                <button type="button" class="more-item delete" onclick="askDeleteReceipt(${item.rowIndex})">ลบ</button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="history-meta-bar">
+            <div class="meta-item meta-left">วันที่ ${formatDateDisplay(item.date)}</div>
+            <div class="meta-item meta-center">${escapeHtml(item.paymentMethod)}</div>
+            <div class="meta-item meta-right">จำนวน ${escapeHtml(String(item.qty))} ${escapeHtml(item.unit)}</div>
+          </div>
+ 
+          <div style="margin-top:12px; color:#334155; font-size:14px; font-weight:600; line-height:1.5;">${escapeHtml(item.itemDesc)}</div>
+          
+          <div class="history-total">
+            <span class="history-total-label">จำนวนเงิน</span>
+            <span class="history-total-value">${formatMoney(item.amount)}</span>
+          </div>
+          <div class="history-actions single-photo">
+            <button type="button" class="history-action-btn" onclick="openReceiptPhotoManager(${item.rowIndex}, '')">${item.hasImages ? "ดูรูปภาพ" : "แนบรูปภาพ"}</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+ 
+    function askDeleteReceipt(rowIndex) {
+      closeAllMoreMenus();
+      const item = receiptHistory.find(x => Number(x.rowIndex) === Number(rowIndex));
+      openConfirm("ยืนยันการลบรายการรับเงิน", "ต้องการลบรายการของ " + (item ? item.customerName : "") + " ใช่หรือไม่?", () => deleteReceipt(rowIndex));
+    }
+ 
+    function deleteReceipt(rowIndex) {
+      showLoading("กำลังลบรายการ...");
+      google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        showToast(res.message || "ลบเรียบร้อย", "success");
+        loadReceiptHistorySilent();
+      }).withFailureHandler(err => {
+        hideLoading();
+        showToast(getErrorMessage(err), "error");
+      }).deleteReceiptRecord(rowIndex);
+    }
+ 
+    function openEditReceipt(rowIndex) {
+      closeAllMoreMenus();
+      const item = receiptHistory.find(x => Number(x.rowIndex) === Number(rowIndex));
+      if (!item) return;
+ 
+      document.getElementById("editReceiptRow").value = item.rowIndex;
+      document.getElementById("editReceiptCustomer").value = item.customerName;
+      document.getElementById("editReceiptDate").value = isoToThaiDate(item.date);
+      document.getElementById("editReceiptDesc").value = item.itemDesc;
+      document.getElementById("editReceiptQty").value = item.qty;
+      document.getElementById("editReceiptUnit").value = item.unit;
+      document.getElementById("editReceiptAmount").value = item.amount;
+      document.getElementById("editReceiptPayment").value = item.paymentMethod;
+      openModal("editReceiptModal");
+    }
+ 
+    function saveEditedReceipt() {
+      const record = {
+        rowIndex: Number(document.getElementById("editReceiptRow").value),
+        customerName: document.getElementById("editReceiptCustomer").value.trim(),
+        date: thaiToIsoDate(document.getElementById("editReceiptDate").value.trim()),
+        itemDesc: document.getElementById("editReceiptDesc").value.trim(),
+        qty: parseFloat(document.getElementById("editReceiptQty").value),
+        unit: document.getElementById("editReceiptUnit").value,
+        amount: parseFloat(document.getElementById("editReceiptAmount").value),
+        paymentMethod: document.getElementById("editReceiptPayment").value,
+        note: ""
+      };
+ 
+      if (!record.customerName || !record.date || !record.itemDesc || isNaN(record.qty) || !record.unit || isNaN(record.amount)) {
+        showToast("กรุณากรอกข้อมูลให้ครบถ้วนทุกช่อง", "error");
+        return;
+      }
+ 
+      showLoading("กำลังบันทึกการแก้ไข...");
+      google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        closeModal("editReceiptModal");
+        showToast(res.message || "แก้ไขเรียบร้อย", "success");
+        // ใช้รายการที่ backend ส่งกลับมาแทนการอ้างอิง index ของ array เดิม
+        // จึงไม่ทำให้รายการหายหลังแก้ไข แม้วันที่/ข้อมูลจะเปลี่ยน
+        if (res && res.record) {
+          const updated = res.record;
+          const idx = receiptHistory.findIndex(x => Number(x.rowIndex) === Number(updated.rowIndex));
+          if (idx >= 0) receiptHistory[idx] = updated;
+          else receiptHistory.unshift(updated);
+          receiptHistory.sort((a,b) => Number(b.rowIndex) - Number(a.rowIndex));
+          localStorage.setItem("cache_receiptHistory", JSON.stringify(receiptHistory));
+          renderReceiptHistory();
+        } else {
+          google.script.run.withSuccessHandler(data => {
+            if (Array.isArray(data)) {
+              receiptHistory = data;
+              localStorage.setItem("cache_receiptHistory", JSON.stringify(data));
+              renderReceiptHistory();
+            }
+          }).getReceiptsData("", "");
+        }
+      }).withFailureHandler(err => {
+        hideLoading();
+        showToast(getErrorMessage(err), "error");
+      }).updateReceiptRecord(record);
+    }
+ 
+    function filterEditReceiptCustomers() {
+      const input = document.getElementById("editReceiptCustomer");
+      const box = document.getElementById("editReceiptSuggestions");
+      filterReceiptCustomers(input, box);
+    }
+ 
+    function loadQuotationHistorySilent() {
+      google.script.run.withSuccessHandler(data => {
+        if (Array.isArray(data)) {
+          quotationHistory = data;
+          localStorage.setItem("cache_quotationHistory", JSON.stringify(data));
+          renderQuotationHistory();
+        }
+      }).getQuotationHistory();
+    }
+ 
+    function renderQuotationHistory() {
+      const container = document.getElementById("quotationHistoryList");
+      const search = document.getElementById("quotationHistorySearch").value.trim().toLowerCase();
+      let list = search ? quotationHistory.filter(item =>
+        String(item.customerName).toLowerCase().includes(search) ||
+        String(item.quotationNo).includes(search)
+      ) : quotationHistory;
+ 
+      container.innerHTML = "";
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty"><div>ไม่พบประวัติใบเสนอราคา</div></div>`;
+        return;
+      }
+ 
+      list.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "history-card";
+        const no = String(item.quotationNo || "");
+        card.innerHTML = `
+          <div class="history-top">
+            <div>
+              <div class="history-number" style="background:#2563eb;">ใบเสนอราคาเลขที่ ${escapeHtml(no)}</div>
+              <div class="history-customer">${escapeHtml(item.customerName)}</div>
+            </div>
+            <div class="more-wrap">
+              <button type="button" class="more-btn" onclick="toggleMoreMenu(this)">⋮</button>
+              <div class="more-menu">
+                <button type="button" class="more-item" onclick="openEditQuotation('${encodeURIComponent(item.sheetName)}')">แก้ไข</button>
+                <button type="button" class="more-item delete" onclick="askDeleteQuotation('${encodeURIComponent(item.sheetName)}')">ลบ</button>
+              </div>
+            </div>
+          </div>
+          <div class="history-meta" style="margin-top:8px;"><span class="pill blue">${escapeHtml(item.date)}</span></div>
+          <div class="history-total">
+            <span class="history-total-label">จำนวนเงินรวม</span>
+            <span class="history-total-value">${formatMoney(item.total)}</span>
+          </div>
+          <div class="history-actions quotation-actions">
+            <button type="button" class="history-action-btn" onclick="openQuotationPhotoManager('${encodeURIComponent(item.sheetName)}','')">${item.hasImages ? "ดูรูปภาพ" : "แนบรูปภาพ"}</button>
+            <button type="button" class="history-action-btn" style="color:#6d28d9; border-color:#ddd6fe; background:#faf5ff;" onclick="openQuotationPrintMenu('${encodeURIComponent(item.sheetName)}')">เลือกเอกสาร</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+ 
+ 
+    function openDraftPhotoViewer(type, card) {
+      const images = type === "quotationDraft" ? (quotationDraftImages || []) : ((card && card._images) || []);
+      if (!images.length) return false;
+      photoViewerState = {
+        type: type,
+        key: null,
+        card: card || null,
+        title: "",
+        images: images,
+        selectedIndex: Math.max(0, images.length - 1),
+        zoom: 1
+      };
+      renderPhotoViewer();
+      openModal("photoViewerModal");
+      return true;
+    }
+ 
+    function openPhotoChoiceForDraftQuotation() {
+      if (openDraftPhotoViewer("quotationDraft", null)) return;
+      photoPickTarget = { type:"quotationDraft" };
+      openModal("photoChoiceModal");
+    }
+ 
+    function updateQuotationPhotoCount() {
+      const el = document.getElementById("quotationPhotoCount");
+      if (el) el.textContent = (quotationDraftImages || []).length + " รูป";
+    }
+ 
+    function openPhotoChoiceForDraftReceipt(btn) {
+      const card = btn.closest(".item-card");
+      if (!card._images) card._images = [];
+      if (openDraftPhotoViewer("receiptDraft", card)) return;
+      photoPickTarget = { type:"receiptDraft", card:card };
+      openModal("photoChoiceModal");
+    }
+ 
+    function openPhotoChoiceForQuotation(encodedSheetName) {
+      closeAllMoreMenus();
+      photoPickTarget = { type:"quotation", sheetName:decodeURIComponent(encodedSheetName) };
+      openModal("photoChoiceModal");
+    }
+ 
+    function openPhotoChoiceForReceipt(rowIndex) {
+      closeAllMoreMenus();
+      photoPickTarget = { type:"receipt", rowIndex:Number(rowIndex) };
+      openModal("photoChoiceModal");
+    }
+ 
+    function choosePhotoInput(mode) {
+      closeModal("photoChoiceModal");
+      const input = document.getElementById(mode === "camera" ? "cameraInput" : "albumInput");
+      input.value = "";
+      input.click();
+    }
+ 
+    function requestAppFullscreen() {
+      try {
+        const el=document.documentElement;
+        if (document.fullscreenElement) return;
+        if (el.requestFullscreen) el.requestFullscreen().catch(()=>{});
+      } catch(e) {}
+    }
+ 
+    document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById("cameraInput").addEventListener("change", function(){ handlePhotoFiles(this.files); });
+      document.getElementById("albumInput").addEventListener("change", function(){ handlePhotoFiles(this.files); });
+      document.querySelectorAll("input[type=text][inputmode=numeric]").forEach(function(el) {
+        el.addEventListener("blur", function(){ normalizeThaiDateInput(el); });
+      });
+    });
+ 
+    // ตรวจว่าไฟล์เป็น HEIC/HEIF หรือไม่ โดยเช็คทั้ง MIME type และนามสกุลไฟล์
+    // (มือถือหลายรุ่นแนบไฟล์ .heic/.heif มาโดย browser รายงาน type เป็นค่าว่างหรือ "" บ่อยครั้ง จึงต้องเช็คนามสกุลไฟล์ควบคู่กันไปด้วย)
+    function isHeicHeifFile(file) {
+      if (!file) return false;
+      const type = String(file.type || "").toLowerCase();
+      if (type === "image/heic" || type === "image/heif" || type === "image/heic-sequence" || type === "image/heif-sequence") return true;
+      const name = String(file.name || "").toLowerCase();
+      return /\.(heic|heif)$/.test(name);
+    }
+ 
+    // โหลด heic2any แบบ Dynamic เฉพาะตอนพบไฟล์ HEIC/HEIF เท่านั้น (ไม่โหลดล่วงหน้าเพื่อไม่ให้หน้าเว็บช้าลง)
+    // มี CDN fallback 2 แหล่ง หากโหลดไม่สำเร็จจะแจ้งข้อความที่เข้าใจง่ายและไม่ทำให้ JavaScript ทั้งระบบหยุดทำงาน
+    let heic2anyLoadPromise = null;
+    const HEIC2ANY_CDN_URLS = [
+      "https://cdnjs.cloudflare.com/ajax/libs/heic2any/0.0.4/heic2any.min.js",
+      "https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"
+    ];
+    function loadHeic2Any() {
+      if (typeof window.heic2any === "function") return Promise.resolve(window.heic2any);
+      if (heic2anyLoadPromise) return heic2anyLoadPromise;
+ 
+      heic2anyLoadPromise = new Promise((resolve, reject) => {
+        let i = 0;
+        const tryNext = () => {
+          if (i >= HEIC2ANY_CDN_URLS.length) {
+            reject(new Error("ไม่สามารถโหลดตัวแปลงไฟล์ HEIC ได้ กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตแล้วลองใหม่อีกครั้ง"));
+            return;
+          }
+          const url = HEIC2ANY_CDN_URLS[i++];
+          const script = document.createElement("script");
+          script.src = url;
+          script.async = true;
+          script.onload = () => {
+            if (typeof window.heic2any === "function") resolve(window.heic2any);
+            else tryNext();
+          };
+          script.onerror = () => tryNext();
+          document.head.appendChild(script);
+        };
+        tryNext();
+      }).catch(err => {
+        heic2anyLoadPromise = null; // อนุญาตให้ลองโหลดใหม่ในครั้งถัดไป
+        throw err;
+      });
+ 
+      return heic2anyLoadPromise;
+    }
+ 
+    // แปลงไฟล์ HEIC/HEIF ให้เป็น JPEG Blob ก่อน จึงค่อยส่งต่อเข้า pipeline บีบอัดรูปตามปกติ
+    async function convertHeicToJpegBlob(file) {
+      try {
+        const heic2any = await loadHeic2Any();
+        const result = await heic2any({ blob: file, toType: "image/jpeg", quality: 0.85 });
+        return Array.isArray(result) ? result[0] : result;
+      } catch (e) {
+        const msg = (e && e.message) ? e.message : "ไม่สามารถแปลงไฟล์ HEIC/HEIF นี้ได้";
+        throw new Error(msg);
+      }
+    }
+ 
+    async function compressImageFile(sourceFile) {
+      // บีบอัดตั้งแต่ฝั่งมือถือก่อนส่งเข้า Apps Script เพื่อรองรับรูปต้นฉบับขนาดใหญ่มาก
+      // ใช้ object URL / createImageBitmap แทน FileReader เพื่อไม่สร้าง Base64 ขนาดเท่าไฟล์ต้นฉบับใน RAM
+      let workingFile = sourceFile;
+ 
+      // ถ้าเป็น HEIC/HEIF ให้แปลงเป็น JPEG ก่อน (Resize/Compress ต่อด้วย pipeline เดิมด้านล่าง)
+      if (isHeicHeifFile(sourceFile)) {
+        workingFile = await convertHeicToJpegBlob(sourceFile);
+      }
+ 
+      return new Promise((resolve, reject) => {
+        let objectUrl = null;
+        let settled = false;
+        const finish = (fn, value) => {
+          if (settled) return;
+          settled = true;
+          if (objectUrl) { try { URL.revokeObjectURL(objectUrl); } catch(e) {} }
+          fn(value);
+        };
+ 
+        const compressBitmap = (source, closeSource) => {
+          try {
+            const sw = Number(source.width || 0);
+            const sh = Number(source.height || 0);
+            if (!sw || !sh) throw new Error("อ่านขนาดรูปภาพไม่ได้");
+ 
+            // จำกัดด้านยาวเพื่อให้ไฟล์สุดท้ายเล็กและส่งเร็ว แต่ยังคมชัดสำหรับมือถือ/เอกสาร
+            const maxSide = 1000;
+            const scale = Math.min(1, maxSide / Math.max(sw, sh));
+            const canvas = document.createElement("canvas");
+            canvas.width = Math.max(1, Math.round(sw * scale));
+            canvas.height = Math.max(1, Math.round(sh * scale));
+            const ctx = canvas.getContext("2d", {alpha:false});
+            if (!ctx) throw new Error("เบราว์เซอร์ไม่รองรับการประมวลผลรูปภาพ");
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = "high";
+            ctx.drawImage(source, 0, 0, canvas.width, canvas.height);
+ 
+            // JPEG คุณภาพพอดีสำหรับการดูบนมือถือ/เก็บหลักฐาน และลดขนาดลงมาก
+            const data = canvas.toDataURL("image/jpeg", 0.52);
+            if (!data || data.length < 100) throw new Error("สร้างรูปภาพที่บีบอัดไม่ได้");
+            if (closeSource && typeof source.close === "function") { try { source.close(); } catch(e) {} }
+            resolve({
+              data:data,
+              mimeType:"image/jpeg",
+              name:(sourceFile.name || "photo").replace(/\.[^.]+$/, "") + ".jpg"
+            });
+          } catch (e) {
+            if (closeSource && source && typeof source.close === "function") { try { source.close(); } catch(x) {} }
+            finish(reject, e);
+          }
+        };
+ 
+        // วิธีหลัก: ไม่อ่านไฟล์ 90MB เป็น Base64 ก่อน จึงลดปัญหา RAM/ขนาด payload
+        if (typeof createImageBitmap === "function") {
+          createImageBitmap(workingFile, {imageOrientation:"from-image"})
+            .then(bitmap => compressBitmap(bitmap, true))
+            .catch(() => {
+              // fallback สำหรับเบราว์เซอร์ที่ createImageBitmap อ่านไฟล์บางชนิดไม่ได้
+              objectUrl = URL.createObjectURL(workingFile);
+              const img = new Image();
+              img.onload = () => compressBitmap(img, false);
+              img.onerror = () => finish(reject, new Error("ไม่สามารถอ่านรูปภาพนี้ได้"));
+              img.src = objectUrl;
+            });
+          return;
+        }
+ 
+        // fallback รุ่นเก่า: ใช้ object URL ก่อน ไม่สร้าง Base64 ของไฟล์ต้นฉบับ
+        objectUrl = URL.createObjectURL(workingFile);
+        const img = new Image();
+        img.onload = () => compressBitmap(img, false);
+        img.onerror = () => finish(reject, new Error("ไม่สามารถอ่านรูปภาพนี้ได้"));
+        img.src = objectUrl;
+      });
+    }
+ 
+    async function handlePhotoFiles(fileList) {
+      if (!photoPickTarget || !fileList || !fileList.length) return;
+      const files = Array.from(fileList);
+      showLoading("กำลังเตรียมรูปภาพ...");
+      try {
+        const images = await Promise.all(files.map(compressImageFile));
+        const target = photoPickTarget;
+        photoPickTarget = null;
+ 
+        if (target.type === "quotationDraft") {
+          quotationDraftImages = (quotationDraftImages || []).concat(images);
+          updateQuotationPhotoCount();
+          hideLoading();
+          photoViewerState = {type:"quotationDraft", key:null, card:null, title:"", images:quotationDraftImages, selectedIndex:quotationDraftImages.length-images.length, zoom:1};
+          renderPhotoViewer();
+          openModal("photoViewerModal");
+          return;
+        }
+ 
+        if (target.type === "receiptDraft") {
+          if (!target.card._images) target.card._images = [];
+          target.card._images = target.card._images.concat(images);
+          const count = target.card._images.length;
+          const el = target.card.querySelector(".photo-count");
+          if (el) el.textContent = count + " รูป";
+          hideLoading();
+          photoViewerState = {type:"receiptDraft", key:null, card:target.card, title:"", images:target.card._images, selectedIndex:count-images.length, zoom:1};
+          renderPhotoViewer();
+          openModal("photoViewerModal");
+          return;
+        }
+ 
+        showLoading("กำลังอัปโหลดรูปภาพ...");
+        const finishHistoryUpload = (type, key) => {
+          const loadFn = type === "quotation" ? google.script.run.getQuotationImages : google.script.run.getReceiptImages;
+        };
+        if (target.type === "quotation") {
+          google.script.run.withSuccessHandler(uploaded => {
+            hideLoading();
+            const s = photoViewerState;
+            const added = Array.isArray(uploaded) ? uploaded : [];
+            if (s && s.type === "quotation" && s.key === target.sheetName) {
+              s.images = (Array.isArray(s.images) ? s.images : []).concat(added);
+              s.selectedIndex = Math.max(0, s.images.length - added.length);
+              s.zoom = 1;
+              renderPhotoViewer();
+              openModal("photoViewerModal");
+            }
+            loadQuotationHistorySilent();
+            showToast("แนบรูปใบเสนอราคาเรียบร้อย", "success");
+          }).withFailureHandler(err => { hideLoading(); showToast(getErrorMessage(err), "error"); }).uploadQuotationImages(target.sheetName, images);
+        } else if (target.type === "receipt") {
+          google.script.run.withSuccessHandler(uploaded => {
+            hideLoading();
+            const s = photoViewerState;
+            const added = Array.isArray(uploaded) ? uploaded : [];
+            if (s && s.type === "receipt" && Number(s.key) === Number(target.rowIndex)) {
+              s.images = (Array.isArray(s.images) ? s.images : []).concat(added);
+              s.selectedIndex = Math.max(0, s.images.length - added.length);
+              s.zoom = 1;
+              renderPhotoViewer();
+              openModal("photoViewerModal");
+            }
+            loadReceiptHistorySilent();
+            showToast("แนบรูปในรายการรับเงินเรียบร้อย", "success");
+          }).withFailureHandler(err => { hideLoading(); showToast(getErrorMessage(err), "error"); }).uploadReceiptImages(Number(target.rowIndex), images);
+        }
+      } catch (err) {
+        hideLoading();
+        showToast("ไม่สามารถแนบรูปได้: " + getErrorMessage(err), "error");
+      }
+    }
+ 
+    function openQuotationPhotoManager(encodedSheetName, title) {
+      const sheetName = decodeURIComponent(encodedSheetName);
+      showLoading("กำลังโหลดรูปภาพ...");
+      google.script.run.withSuccessHandler(images => {
+        hideLoading();
+        photoViewerState = {type:"quotation", key:sheetName, title:"", images:Array.isArray(images)?images:[], selectedIndex:0, zoom:1};
+        renderPhotoViewer();
+        openModal("photoViewerModal");
+      }).withFailureHandler(err => {
+        hideLoading(); showToast(getErrorMessage(err), "error");
+      }).getQuotationImages(sheetName);
+    }
+ 
+    function openReceiptPhotoManager(rowIndex, title) {
+      showLoading("กำลังโหลดรูปภาพ...");
+      google.script.run.withSuccessHandler(images => {
+        hideLoading();
+        photoViewerState = {type:"receipt", key:Number(rowIndex), title:"", images:Array.isArray(images)?images:[], selectedIndex:0, zoom:1};
+        renderPhotoViewer();
+        openModal("photoViewerModal");
+      }).withFailureHandler(err => {
+        hideLoading(); showToast(getErrorMessage(err), "error");
+      }).getReceiptImages(Number(rowIndex));
+    }
+ 
+    function renderPhotoViewer() {
+      const s = photoViewerState;
+      const box = document.getElementById("photoViewerContent");
+      if (!s || !box) return;
+      if (!Array.isArray(s.images) || !s.images.length) {
+        box.innerHTML = `
+          <div class="photo-empty">ยังไม่มีรูปภาพแนบ</div>
+          <div class="photo-tools" style="grid-template-columns:1fr;">
+            <button type="button" class="photo-tool-btn" onclick="addPhotoFromViewer()">เพิ่มรูป</button>
+          </div>`;
+        return;
+      }
+      if (s.selectedIndex >= s.images.length) s.selectedIndex = s.images.length - 1;
+      if (s.selectedIndex < 0) s.selectedIndex = 0;
+      const selected = s.images[s.selectedIndex];
+      const src = selected.data || selected.dataUrl || selected.thumbnailUrl || selected.viewUrl || selected.downloadUrl || "";
+      box.innerHTML = `
+        <div class="photo-main-wrap" ontouchstart="photoTouchStart(event)" ontouchmove="photoTouchMove(event)" ontouchend="photoTouchEnd(event)"><img class="photo-main" style="transform:scale(${Number(s.zoom || 1)})" src="${escapeHtml(src)}" alt="" draggable="false"></div>
+        <div class="photo-tools">
+          <button type="button" class="photo-tool-btn" onclick="saveCurrentPhoto()">บันทึกภาพ</button>
+          <button type="button" class="photo-tool-btn danger" onclick="deleteCurrentPhoto()">ลบภาพ</button>
+          <button type="button" class="photo-tool-btn gray" onclick="addPhotoFromViewer()">เพิ่มรูป</button>
+        </div>
+        <div class="photo-grid">
+          ${s.images.map((im,i)=>`<button type="button" class="photo-thumb ${i===s.selectedIndex?"active":""}" onclick="selectPhoto(${i})"><img src="${escapeHtml(im.data || im.dataUrl || im.thumbnailUrl || im.viewUrl || im.downloadUrl || "")}" alt=""></button>`).join("")}
+        </div>`;
+    }
+ 
+    function selectPhoto(index) {
+      photoViewerState.selectedIndex = Number(index);
+      photoViewerState.zoom = 1;
+      renderPhotoViewer();
+    }
+ 
+    async function saveCurrentPhoto() {
+      const im = photoViewerState && photoViewerState.images ? photoViewerState.images[photoViewerState.selectedIndex] : null;
+      if (!im) return;
+      const src = im.data || im.dataUrl || im.downloadUrl || im.viewUrl || im.url;
+      if (!src) { showToast("ไม่พบไฟล์รูปภาพ", "error"); return; }
+ 
+      try {
+        // บนมือถือให้เปิดเมนู Share ของระบบทันที เพื่อให้ผู้ใช้เลือก "บันทึกภาพ/Save Image"
+        // แทนการดาวน์โหลดไฟล์แบบเดิม
+        let blob;
+        if (/^data:/i.test(src)) {
+          blob = await (await fetch(src)).blob();
+        } else {
+          const response = await fetch(src, { credentials: "omit", mode: "cors" });
+          if (!response.ok) throw new Error("โหลดรูปภาพไม่สำเร็จ");
+          blob = await response.blob();
+        }
+ 
+        const fileName = im.name || "ภาพ.jpg";
+        const mime = blob.type || "image/jpeg";
+        const file = new File([blob], fileName, { type: mime });
+ 
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: fileName
+          });
+          return;
+        }
+ 
+        // ถ้าเบราว์เซอร์ไม่รองรับ Share ให้ใช้การดาวน์โหลดเป็น fallback
+        const objectUrl = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = objectUrl;
+        a.download = fileName;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 1500);
+        showToast("กำลังบันทึกภาพลงเครื่อง...", "success");
+      } catch (err) {
+        // ผู้ใช้กดปิดเมนู Share ไม่ถือว่าเป็นข้อผิดพลาด
+        if (err && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+        showToast("ไม่สามารถเปิดเมนูบันทึก/แชร์ภาพได้", "error");
+      }
+    }
+ 
+    function deleteCurrentPhoto() {
+      const s = photoViewerState;
+      const im = s && s.images ? s.images[s.selectedIndex] : null;
+      if (!im) return;
+      if (s.type === "quotationDraft" || s.type === "receiptDraft") {
+        openConfirm("ยืนยันการลบรูปภาพ", "ต้องการลบรูป " + (im.name || "ภาพ") + " ใช่หรือไม่?", () => {
+          s.images.splice(s.selectedIndex, 1);
+          if (s.type === "quotationDraft") { quotationDraftImages = s.images; updateQuotationPhotoCount(); }
+          else { s.card._images = s.images; const el=s.card.querySelector(".photo-count"); if(el) el.textContent=s.images.length+" รูป"; }
+          if (s.selectedIndex >= s.images.length) s.selectedIndex=Math.max(0,s.images.length-1);
+          renderPhotoViewer();
+          showToast("ลบรูปภาพเรียบร้อย", "success");
+        });
+        return;
+      }
+      openConfirm("ยืนยันการลบรูปภาพ", "ต้องการลบรูป " + (im.name || "ภาพ") + " ใช่หรือไม่?", () => {
+        showLoading("กำลังลบรูปภาพ...");
+        const runner = google.script.run.withSuccessHandler(res => {
+          hideLoading();
+          // ใช้รูปที่ backend ส่งกลับมาเสมอ เพื่อให้ถ้ายังมีรูปเหลืออยู่
+          // viewer ยังคงแสดงภาพและปุ่ม บันทึกภาพ / ลบภาพ / เพิ่มรูป / ปิด
+          s.images = res && Array.isArray(res.images) ? res.images : [];
+          if (s.selectedIndex >= s.images.length) s.selectedIndex = Math.max(0, s.images.length-1);
+          s.zoom = 1;
+          renderPhotoViewer();
+          if (s.type === "quotation") loadQuotationHistorySilent(); else loadReceiptHistorySilent();
+          showToast("ลบรูปภาพเรียบร้อย", "success");
+        }).withFailureHandler(err => { hideLoading(); showToast(getErrorMessage(err), "error"); });
+        if (s.type === "quotation") runner.deleteQuotationImage(s.key, im.fileId);
+        else runner.deleteReceiptImage(s.key, im.fileId);
+      });
+    }
+ 
+    function addPhotoFromViewer() {
+      const s=photoViewerState;
+      if (!s) return;
+      if (s.type === "quotationDraft") photoPickTarget={type:"quotationDraft"};
+      else if (s.type === "receiptDraft") photoPickTarget={type:"receiptDraft",card:s.card};
+      else if (s.type === "quotation") photoPickTarget={type:"quotation",sheetName:s.key};
+      else if (s.type === "receipt") photoPickTarget={type:"receipt",rowIndex:s.key};
+      else return;
+      openModal("photoChoiceModal");
+    }
+ 
+    let photoTouchState = {active:false, startDistance:0, startScale:1};
+ 
+    function photoDistance(t1, t2) {
+      const dx = t1.clientX - t2.clientX;
+      const dy = t1.clientY - t2.clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+ 
+    function photoTouchStart(e) {
+      if (!e.touches || e.touches.length !== 2) return;
+      e.preventDefault();
+      const s = photoViewerState;
+      photoTouchState = {active:true, startDistance:photoDistance(e.touches[0], e.touches[1]), startScale:Number(s.zoom || 1)};
+    }
+ 
+    function photoTouchMove(e) {
+      if (!photoTouchState.active || !e.touches || e.touches.length !== 2) return;
+      e.preventDefault();
+      const distance = photoDistance(e.touches[0], e.touches[1]);
+      if (!distance || !photoTouchState.startDistance) return;
+      photoViewerState.zoom = Math.min(5, Math.max(1, photoTouchState.startScale * distance / photoTouchState.startDistance));
+      const img = e.currentTarget.querySelector(".photo-main");
+      if (img) img.style.transform = "scale(" + photoViewerState.zoom + ")";
+    }
+ 
+    function photoTouchEnd(e) {
+      if (photoTouchState.active) {
+        e.preventDefault();
+        photoTouchState.active = false;
+      }
+    }
+ 
+    function openEditQuotation(encodedSheetName) {
+      closeAllMoreMenus();
+      const sheetName = decodeURIComponent(encodedSheetName);
+      showLoading("กำลังโหลดข้อมูลใบเสนอราคา...");
+      google.script.run.withSuccessHandler(data => {
+        hideLoading();
+        if (!data) { showToast("ไม่พบใบเสนอราคาที่ต้องการแก้ไข", "error"); return; }
+        editingQuotationSheetName = sheetName;
+        document.getElementById("editQuotationSheetName").value = sheetName;
+        const select = document.getElementById("editQuotationCustomerSelect");
+        const other = document.getElementById("editQuotationCustomerOther");
+        const customer = String(data.customerName || "");
+        let opt = Array.from(select.options).find(o => o.value === customer);
+        if (!opt && customer) {
+          opt = document.createElement("option"); opt.value = customer; opt.textContent = customer;
+          select.insertBefore(opt, select.lastElementChild);
+        }
+        if (opt) { select.value = customer; other.value = ""; other.style.display = "none"; }
+        else { select.value = "other"; other.value = customer; other.style.display = "block"; }
+        document.getElementById("editQuotationDate").value = isoToThaiDate(data.date || "");
+        document.getElementById("editQuotationRemark").value = data.remark || "";
+        const items = document.getElementById("editQuotationItems");
+        items.innerHTML = "";
+        (data.items || []).forEach(item => addEditQuotationItem(item));
+        if (!items.children.length) addEditQuotationItem();
+        calculateEditQuotationGrandTotal();
+        openModal("editQuotationModal");
+      }).withFailureHandler(err => {
+        hideLoading(); showToast(getErrorMessage(err), "error");
+      }).getQuotationRecord(sheetName);
+    }
+ 
+    function toggleEditQuotationOther() {
+      const select = document.getElementById("editQuotationCustomerSelect");
+      const other = document.getElementById("editQuotationCustomerOther");
+      if (select.value === "other") { other.style.display = "block"; other.focus(); }
+      else { other.style.display = "none"; other.value = ""; }
+    }
+ 
+    function getEditQuotationCustomerName() {
+      const select = document.getElementById("editQuotationCustomerSelect");
+      return select.value === "other" ? document.getElementById("editQuotationCustomerOther").value.trim() : select.value.trim();
+    }
+ 
+    function addEditQuotationItem(item) {
+      const container = document.getElementById("editQuotationItems");
+      const index = container.children.length + 1;
+      const card = document.createElement("div");
+      card.className = "item-card";
+      item = item || {};
+      card.innerHTML = `
+        <div class="item-header blue-bar">
+          <div class="item-number">รายการที่ ${index}</div>
+          ${index > 1 ? `<button type="button" class="icon-delete" onclick="removeEditQuotationItem(this)" title="ลบรายการ"><svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg></button>` : ""}
+        </div>
+        <label>ชื่อรายการ</label>
+        <input type="text" class="edit-quotation-desc" placeholder="รายละเอียดสินค้า / งาน..." value="${escapeHtml(String(item.desc || ""))}">
+        <div class="form-row">
+          <div class="field"><label>จำนวน</label><input type="number" class="edit-quotation-qty" min="0" step="any" placeholder="0" value="${item.qty ?? ""}" oninput="calculateEditQuotationItem(this)"></div>
+          <div class="field"><label>หน่วย</label><select class="edit-quotation-unit">
+            <option value="">-- เลือกหน่วย --</option><option value="ชุด">ชุด</option><option value="ตัว">ตัว</option><option value="ชิ้น">ชิ้น</option><option value="อัน">อัน</option><option value="ตลับ">ตลับ</option><option value="รู">รู</option><option value="งาน">งาน</option>
+          </select></div>
+        </div>
+        <label>ราคาต่อหน่วย (บาท)</label>
+        <input type="number" class="edit-quotation-price" min="0" step="0.01" placeholder="0.00" value="${item.price ?? ""}" oninput="calculateEditQuotationItem(this)">
+        <div class="item-amount">รวมเป็นเงิน: <span class="edit-quotation-item-amount">฿0.00</span></div>`;
+      container.appendChild(card);
+      card.querySelector(".edit-quotation-unit").value = item.unit || "";
+      updateEditQuotationIndexes();
+      calculateEditQuotationItem(card.querySelector(".edit-quotation-price"));
+    }
+ 
+    function removeEditQuotationItem(btn) { btn.closest(".item-card").remove(); updateEditQuotationIndexes(); calculateEditQuotationGrandTotal(); }
+ 
+    function updateEditQuotationIndexes() {
+      document.querySelectorAll("#editQuotationItems .item-card").forEach((card,index) => {
+        card.querySelector(".item-number").textContent = "รายการที่ " + (index + 1);
+        const header=card.querySelector(".item-header"), oldDel=header.querySelector(".icon-delete");
+        if(index===0 && oldDel) oldDel.remove();
+        if(index>0 && !oldDel){ const btn=document.createElement("button"); btn.type="button"; btn.className="icon-delete"; btn.title="ลบรายการ"; btn.onclick=()=>removeEditQuotationItem(btn); btn.innerHTML=`<svg viewBox="0 0 24 24"><path d="M4 7h16"></path><path d="M10 11v6"></path><path d="M14 11v6"></path><path d="M6 7l1 14h10l1-14"></path><path d="M9 7V4h6v3"></path></svg>`; header.appendChild(btn); }
+      });
+    }
+ 
+    function calculateEditQuotationItem(el) {
+      const card=el.closest(".item-card"); if(!card) return;
+      const qty=parseFloat(card.querySelector(".edit-quotation-qty").value)||0;
+      const price=parseFloat(card.querySelector(".edit-quotation-price").value)||0;
+      card.querySelector(".edit-quotation-item-amount").textContent=formatMoney(qty*price);
+      calculateEditQuotationGrandTotal();
+    }
+ 
+    function calculateEditQuotationGrandTotal() {
+      let total=0,count=0;
+      document.querySelectorAll("#editQuotationItems .item-card").forEach(card=>{
+        const desc=card.querySelector(".edit-quotation-desc").value.trim();
+        const qty=parseFloat(card.querySelector(".edit-quotation-qty").value)||0;
+        const price=parseFloat(card.querySelector(".edit-quotation-price").value)||0;
+        if(desc||qty||price) count++;
+        total += qty*price;
+      });
+      document.getElementById("editQuotationItemCount").textContent=count+" รายการ";
+      document.getElementById("editQuotationGrandTotal").textContent=formatMoney(total);
+    }
+ 
+    function saveEditedQuotation() {
+      const sheetName=document.getElementById("editQuotationSheetName").value || editingQuotationSheetName;
+      const customerName=getEditQuotationCustomerName();
+      const dateInput=document.getElementById("editQuotationDate"); normalizeThaiDateInput(dateInput);
+      const date=thaiToIsoDate(dateInput.value);
+      const cards=document.querySelectorAll("#editQuotationItems .item-card");
+      let items=[],valid=!!customerName&&!!date;
+      cards.forEach(card=>{
+        const desc=card.querySelector(".edit-quotation-desc").value.trim();
+        const qty=card.querySelector(".edit-quotation-qty").value.trim();
+        const unit=card.querySelector(".edit-quotation-unit").value.trim();
+        const price=card.querySelector(".edit-quotation-price").value.trim();
+        if(!desc||!qty||!unit||!price||isNaN(parseFloat(qty))||isNaN(parseFloat(price))) valid=false;
+        items.push({desc,qty:parseFloat(qty),unit,price:parseFloat(price)});
+      });
+      if(!valid){showToast("กรุณากรอกข้อมูลให้ครบทุกช่อง", "error");return;}
+      const btn=document.getElementById("editQuotationSaveBtn"); btn.disabled=true; showLoading("กำลังบันทึกการแก้ไข...");
+      google.script.run.withSuccessHandler(res=>{
+        hideLoading(); btn.disabled=false; closeModal("editQuotationModal"); editingQuotationSheetName=res.sheetName || sheetName;
+        showToast(res.message || "แก้ไขใบเสนอราคาเรียบร้อย", "success"); loadQuotationHistorySilent();
+      }).withFailureHandler(err=>{hideLoading();btn.disabled=false;showToast(getErrorMessage(err),"error");}).updateQuotationRecord({sheetName,customerName,date,remark:document.getElementById("editQuotationRemark").value.trim(),items});
+    }
+ 
+    function askDeleteQuotation(encodedSheetName) {
+      closeAllMoreMenus();
+      const sheetName = decodeURIComponent(encodedSheetName);
+      const item = quotationHistory.find(x => x.sheetName === sheetName);
+      openConfirm("ยืนยันการลบใบเสนอราคา", "ต้องการลบใบเสนอราคา " + (item ? (item.quotationNo || item.customerName || "รายการนี้") : "รายการนี้") + " ใช่หรือไม่?", () => {
+        showLoading("กำลังลบใบเสนอราคา...");
+        google.script.run.withSuccessHandler(res => {
+          hideLoading();
+          showToast(res.message || "ลบใบเสนอราคาเรียบร้อย", "success");
+          loadQuotationHistorySilent();
+        }).withFailureHandler(err => {
+          hideLoading();
+          showToast(getErrorMessage(err), "error");
+        }).deleteQuotation(sheetName);
+      });
+    }
+ 
+    let quotationPrintTarget = null;
+ 
+    function openQuotationPrintMenu(encodedSheetName) {
+      closeAllMoreMenus();
+      quotationPrintTarget = decodeURIComponent(encodedSheetName);
+      const item = quotationHistory.find(x => x.sheetName === quotationPrintTarget);
+      const hasImages = !!(item && item.hasImages);
+      const imagesBtn = document.getElementById("quotationPrintImagesBtn");
+      const bothBtn = document.getElementById("quotationPrintBothBtn");
+      const text = document.getElementById("quotationPrintModalText");
+      if (imagesBtn) imagesBtn.style.display = hasImages ? "block" : "none";
+      if (bothBtn) bothBtn.style.display = hasImages ? "block" : "none";
+      if (text) text.textContent = hasImages ? "เลือกเอกสารที่ต้องการสร้างเป็น PDF" : "ใบเสนอราคานี้ไม่มีรูปภาพแนบ จึงมีเฉพาะใบเสนอราคา";
+      openModal("quotationPrintModal");
+    }
+ 
+    function createQuotationPrint(mode) {
+      if (!quotationPrintTarget) return;
+      const sheetName = quotationPrintTarget;
+      closeModal("quotationPrintModal");
+ 
+      // เมนู "เลือกเอกสาร" เลือกแล้วให้สร้างเอกสารตามที่เลือกทันที
+      // ไม่ให้ successModal นำปุ่มตัวเลือกจากขั้นตอนสร้างใบเสนอราคามาแสดงซ้ำ
+      const combinedBtn = document.getElementById("openCombinedCreatedPdfBtn");
+      if (combinedBtn) combinedBtn.style.display = "none";
+ 
+      showLoading(mode === "quotation" ? "กำลังสร้างใบเสนอราคา PDF..." : mode === "images" ? "กำลังจัดรูปภาพลง PDF..." : "กำลังสร้างใบเสนอราคาและรูปภาพ PDF...");
+      google.script.run.withSuccessHandler(url => {
+        hideLoading();
+        document.getElementById("successModalTitle").textContent = "สร้าง PDF สำเร็จ";
+        document.getElementById("successModalText").textContent = "กดปุ่มด้านล่างเพื่อเปิดไฟล์ PDF";
+        document.getElementById("openCreatedPdfBtn").textContent = "เปิดไฟล์ PDF";
+        document.getElementById("openCreatedPdfBtn").onclick = () => { window.open(url, "_blank"); closeModal("successModal"); };
+        openModal("successModal");
+      }).withFailureHandler(err => {
+        hideLoading();
+        showToast(getErrorMessage(err), "error");
+      }).createQuotationPrintPdf(sheetName, mode);
+    }
+ 
+    function openQuotationPdf(encodedSheetName) {
+      openQuotationPrintMenu(encodedSheetName);
+    }
+    function openMaterialEstimator() {
+      switchView("materialEstimatorView");
+      materialEstimator.shape="";
+      const selected=document.getElementById('estimateSelectedShape'); if(selected) selected.textContent='รูปทรงที่เลือก: -';
+      document.querySelectorAll('.shape-btn').forEach(b=>b.classList.remove('active'));
+      document.getElementById('estimateStep1').classList.add('active');
+      document.getElementById('estimateStep2').classList.remove('active');
+      const back=document.getElementById('materialBackBtn'); if(back) back.textContent='กลับหน้าหลัก';
+      const cat=document.getElementById('estimateCategory'); if(cat) cat.value='steel';
+      renderEstimateGrades();
+    }
+    function selectMaterialShape(shape) {
+      materialEstimator.shape=shape;
+      const shapeNames={round:'แท่งกลม',hollow:'ทรงกระบอกกลวง',rectangle:'แท่งสี่เหลี่ยม',hex:'ทรงหกเหลี่ยม',box:'กล่องสี่เหลี่ยม',plate:'แผ่นเพลท'};
+      const selected=document.getElementById('estimateSelectedShape'); if(selected) selected.textContent='รูปทรงที่เลือก: '+(shapeNames[shape]||shape);
+      document.querySelectorAll('.shape-btn').forEach(b=>b.classList.toggle('active', b.dataset.shape===shape));
+      renderEstimateGrades();
+      renderEstimateDimensions();
+      materialStep(2);
+    }
+    function materialStep(step) {
+      document.getElementById('estimateStep1').classList.toggle('active',step===1);
+      document.getElementById('estimateStep2').classList.toggle('active',step===2);
+      const back=document.getElementById('materialBackBtn');
+      if(back) back.textContent = step===1 ? 'กลับหน้าหลัก' : 'ย้อนกลับ';
+    }
+    function materialBack() {
+      const step2=document.getElementById('estimateStep2');
+      if(step2 && step2.classList.contains('active')) materialStep(1);
+      else goHome();
+    }
+    function renderEstimateGrades() {
+      const cat=document.getElementById('estimateCategory'), sel=document.getElementById('estimateMaterial'); if(!cat||!sel)return;
+      const shape=materialEstimator.shape;
+      const allowed=MATERIAL_SHAPE_ALLOWED[shape]||[];
+      const categoryKeys=['steel','stainless','nonferrous','plastic'];
+      const availableCats=categoryKeys.filter(key => (MATERIAL_GROUPS[key]||[]).some(x => allowed.includes(x[0])));
+      const oldCat=cat.value;
+      cat.innerHTML=availableCats.map(key=>{
+        const names={steel:'เหล็ก',stainless:'สแตนเลส',nonferrous:'โลหะนอกกลุ่มเหล็ก',plastic:'พลาสติก'};
+        return `<option value="${key}">${names[key]}</option>`;
+      }).join('');
+      cat.value=availableCats.includes(oldCat)?oldCat:(availableCats[0]||'steel');
+      const list=(MATERIAL_GROUPS[cat.value]||[]).filter(x=>allowed.includes(x[0]));
+      const oldMat=sel.value;
+      sel.innerHTML=list.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
+      if(list.length===0) sel.innerHTML='<option value="">ไม่มีวัสดุสำหรับรูปทรงนี้</option>';
+      else if(list.some(x=>x[0]===oldMat)) sel.value=oldMat;
+      calculateMaterialEstimateUI();
+    }
+    function renderEstimateDimensions() {
+      const shape=materialEstimator.shape, box=document.getElementById('estimateDimensions'); box.innerHTML='';
+      const field=(id,label)=>`<div class="field" style="margin-top:10px;"><label>${label} (มม.)</label><input type="number" id="ed_${id}" min="0" step="0.01" oninput="calculateMaterialEstimateUI()"></div>`;
+      if(shape==='round') box.innerHTML=field('outerDiameter','โตนอก')+field('length','ความยาว');
+      if(shape==='hollow') box.innerHTML=field('outerDiameter','โตนอก')+field('innerDiameter','รูใน')+field('length','ความยาว');
+      if(shape==='rectangle') box.innerHTML=field('width','ความกว้าง')+field('height','ความหนา / สูง')+field('length','ความยาว');
+      if(shape==='hex') box.innerHTML=field('width','ขนาดหน้าตัด')+field('length','ความยาว');
+      if(shape==='box') box.innerHTML=field('width','ความกว้าง')+field('height','ความสูง')+field('thickness','ความหนา')+field('length','ความยาว');
+      if(shape==='plate') box.innerHTML=field('width','กว้าง')+field('length','ยาว')+field('thickness','ความหนา');
+      document.getElementById('estimateResult').innerHTML='กรอกขนาดเพื่อคำนวณ';
+      renderEstimateGrades();
+    }
+    function calculateMaterialEstimateUI() {
+      if(!materialEstimator.shape) return;
+      const ids=['outerDiameter','innerDiameter','width','height','thickness','length']; const dims={}; ids.forEach(id=>{const e=document.getElementById('ed_'+id); if(e) dims[id]=parseFloat(e.value)||0;});
+      if(Object.keys(dims).every(k=>!dims[k])) { document.getElementById('estimateResult').innerHTML='กรอกขนาดเพื่อคำนวณ'; return; }
+      const material=document.getElementById('estimateMaterial').value; if(!material) return;
+      google.script.run.withSuccessHandler(r=>{
+        document.getElementById('estimateResult').innerHTML=`<div class="estimate-result-row"><span>น้ำหนักโดยประมาณ</span><strong>${Number(r.weightKg).toFixed(3)} กก.</strong></div><div class="estimate-result-row"><span>ราคาวัสดุอ้างอิง</span><strong>${formatMoney(r.pricePerKg)}/กก.</strong></div><div class="estimate-result-row"><span>ต้นทุนวัสดุโดยประมาณ</span><strong>${formatMoney(r.materialCost)}</strong></div><div class="estimate-source">ราคาอ้างอิง ${escapeHtml(r.checked)} | ${escapeHtml(r.source)}<br>ราคาเป็นราคาอ้างอิงต่อกิโลกรัมและอาจต่างตามขนาด ผู้จำหน่าย ปริมาณ ค่าตัด และค่าขนส่ง</div>`;
+      }).withFailureHandler(err=>showToast(getErrorMessage(err),'error')).calculateMaterialEstimate(materialEstimator.shape,material,dims);
+    }
+ 
+    function renderCustomers() {
+      const container = document.getElementById("customersList");
+      if (!container) return;
+      const kw = document.getElementById("customerSearch").value.trim().toLowerCase();
+      let list = kw ? customers.filter(c => [c.name, c.phone, c.address, c.taxId].join(" ").toLowerCase().includes(kw)) : customers;
+ 
+      container.innerHTML = "";
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div class="empty"><div>ยังไม่มีข้อมูลลูกค้า</div></div>`;
+        return;
+      }
+ 
+      list.forEach(customer => {
+        const card = document.createElement("div");
+        card.className = "history-card";
+        const cleanPhone = String(customer.phone || "").replace(/[^0-9\+]/g, "");
+        card.innerHTML = `
+          <div class="history-top">
+            <div style="min-width:0; flex:1;">
+              <div class="customer-name">${escapeHtml(customer.name)}</div>
+              <div class="customer-detail">
+                ${customer.phone ? `โทร: <a href="tel:${escapeHtml(cleanPhone)}" class="phone-link">${escapeHtml(customer.phone)}</a><br>` : ""}
+                ${customer.address ? escapeHtml(customer.address) + "<br>" : ""}
+                ${customer.taxId ? "เลขผู้เสียภาษี: " + escapeHtml(customer.taxId) : ""}
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              ${customer.phone ? `<a href="tel:${escapeHtml(cleanPhone)}" class="btn-call"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg> โทรออก</a>` : ""}
+              <div class="more-wrap">
+                <button type="button" class="more-btn" onclick="toggleMoreMenu(this)">⋮</button>
+                <div class="more-menu">
+                  <button type="button" class="more-item" onclick="openEditCustomer(${customer.rowIndex})">แก้ไข</button>
+                  <button type="button" class="more-item delete" onclick="askDeleteCustomer(${customer.rowIndex})">ลบ</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+ 
+    function openAddCustomerModal() {
+      document.getElementById("customerModalTitle").textContent = "เพิ่มลูกค้า";
+      document.getElementById("customerEditRow").value = "";
+      document.getElementById("customerNameInput").value = "";
+      document.getElementById("customerPhoneInput").value = "";
+      document.getElementById("customerAddressInput").value = "";
+      document.getElementById("customerTaxInput").value = "";
+      openModal("customerModal");
+    }
+ 
+    function openEditCustomer(rowIndex) {
+      closeAllMoreMenus();
+      const customer = customers.find(c => Number(c.rowIndex) === Number(rowIndex));
+      if (!customer) return;
+ 
+      document.getElementById("customerModalTitle").textContent = "แก้ไขข้อมูลลูกค้า";
+      document.getElementById("customerEditRow").value = customer.rowIndex;
+      document.getElementById("customerNameInput").value = customer.name;
+      document.getElementById("customerPhoneInput").value = customer.phone;
+      document.getElementById("customerAddressInput").value = customer.address;
+      document.getElementById("customerTaxInput").value = customer.taxId;
+      openModal("customerModal");
+    }
+ 
+    function saveCustomer() {
+      const rowIndex = document.getElementById("customerEditRow").value;
+      const data = {
+        rowIndex: rowIndex ? Number(rowIndex) : null,
+        name: document.getElementById("customerNameInput").value.trim(),
+        phone: document.getElementById("customerPhoneInput").value.trim(),
+        address: document.getElementById("customerAddressInput").value.trim(),
+        taxId: document.getElementById("customerTaxInput").value.trim()
+      };
+ 
+      if (!data.name) { showToast("กรุณากรอกชื่อลูกค้า", "error"); return; }
+      showLoading("กำลังบันทึกข้อมูลลูกค้า...");
+ 
+      const runner = google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        closeModal("customerModal");
+        showToast(res.message || "บันทึกเรียบร้อย", "success");
+        loadCustomersSilent();
+      }).withFailureHandler(err => {
+        hideLoading();
+        showToast(getErrorMessage(err), "error");
+      });
+ 
+      if (rowIndex) runner.updateCustomer(data);
+      else runner.addCustomer(data);
+    }
+ 
+    function askDeleteCustomer(rowIndex) {
+      closeAllMoreMenus();
+      const customer = customers.find(c => Number(c.rowIndex) === Number(rowIndex));
+      openConfirm("ยืนยันการลบลูกค้า", "ต้องการลบข้อมูลลูกค้า " + (customer ? customer.name : "") + " ใช่หรือไม่?", () => deleteCustomer(rowIndex));
+    }
+ 
+    function deleteCustomer(rowIndex) {
+      showLoading("กำลังลบข้อมูลลูกค้า...");
+      google.script.run.withSuccessHandler(res => {
+        hideLoading();
+        showToast(res.message || "ลบเรียบร้อย", "success");
+        loadCustomersSilent();
+      }).withFailureHandler(err => {
+        hideLoading();
+        showToast(getErrorMessage(err), "error");
+      }).deleteCustomer(rowIndex);
+    }
+ 
+    function openIncomeSummary() {
+      switchView("incomeSummaryView");
+      const sy=document.getElementById("summaryYear"); const y=new Date().getFullYear(); sy.innerHTML=""; for(let yy=2026;yy<=y;yy++){const o=document.createElement("option");o.value=yy;o.textContent=yy;sy.appendChild(o);} sy.value=y;
+      calculateSummary();
+      google.script.run.withSuccessHandler(data => {
+        if (Array.isArray(data)) {
+          receiptHistory = data;
+          localStorage.setItem("cache_receiptHistory", JSON.stringify(data));
+          calculateSummary();
+        }
+      }).getReceiptsData();
+    }
+ 
+    function calculateSummary() {
+      const month = document.getElementById("summaryMonth").value;
+      const year = document.getElementById("summaryYear").value;
+      let total = 0;
+ 
+      receiptHistory.forEach(record => {
+        const dateParts = String(record.date || "").split("-");
+        if (dateParts.length === 3) {
+          const rYear = dateParts[0];
+          const rMonth = dateParts[1];
+          const matchYear = !year || rYear === year;
+          const matchMonth = month === "all" || rMonth === month;
+          if (matchYear && matchMonth) {
+            total += parseFloat(record.amount) || 0;
+          }
+        }
+      });
+ 
+      document.getElementById("summaryTotalAmount").textContent = formatMoney(total);
+    }
+ 
+    function toggleMoreMenu(btn) {
+      const menu = btn.parentElement.querySelector(".more-menu");
+      const isOpen = menu.classList.contains("show");
+      closeAllMoreMenus();
+      if (!isOpen) menu.classList.add("show");
+    }
+ 
+    function closeAllMoreMenus() {
+      document.querySelectorAll(".more-menu.show").forEach(m => m.classList.remove("show"));
+    }
+ 
+    // navigation stack ของ Modal/Viewer ที่เปิดอยู่ (เรียงจากเปิดก่อนไปเปิดหลังสุด)
+    // ใช้เพื่อให้ปุ่ม Back ของมือถือปิด Modal ที่อยู่บนสุดก่อนเสมอ โดยไม่ออกจากหน้าหลักทันที
+    var modalStack = [];
+    function openModal(id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.classList.add("show");
+      var idx = modalStack.indexOf(id);
+      if (idx !== -1) modalStack.splice(idx, 1);
+      modalStack.push(id);
+    }
+    function closeModal(id) {
+      var el = document.getElementById(id);
+      if (el) el.classList.remove("show");
+      var idx = modalStack.indexOf(id);
+      if (idx !== -1) modalStack.splice(idx, 1);
+      if (id === "photoViewerModal") photoTouchState.active = false;
+      if (id === "editReceiptModal") hideAllCustomerSuggestions();
+    }
+    // ปิด Modal ที่เปิดอยู่บนสุด (ใช้โดยปุ่ม Back ของเครื่อง) คืนค่า true ถ้ามี Modal ถูกปิด
+    function closeTopModal() {
+      while (modalStack.length) {
+        var topId = modalStack[modalStack.length - 1];
+        var el = document.getElementById(topId);
+        if (el && el.classList.contains("show")) {
+          closeModal(topId);
+          return true;
+        }
+        // เผื่อกรณี Modal ถูกปิดไปแล้วโดยไม่ผ่าน closeModal() ให้เอาออกจาก stack แล้วเช็คตัวถัดไป
+        modalStack.pop();
+      }
+      return false;
+    }
+ 
+    function openConfirm(title, text, cb) {
+      document.getElementById("confirmTitle").textContent = title;
+      document.getElementById("confirmText").textContent = text;
+      confirmCallback = cb;
+      document.getElementById("confirmActionBtn").onclick = () => {
+        const fn = confirmCallback;
+        confirmCallback = null;
+        closeModal("confirmModal");
+        if (typeof fn === "function") fn();
+      };
+      openModal("confirmModal");
+    }
+ 
+    function showLoading(text) {
+      document.getElementById("loadingText").textContent = text || "กำลังประมวลผล...";
+      document.getElementById("loadingOverlay").classList.add("show");
+    }
+ 
+    function hideLoading() { document.getElementById("loadingOverlay").classList.remove("show"); }
+ 
+    let toastTimer = null;
+    function showToast(message, type) {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = "toast " + (type === "error" ? "error" : "success");
+      void toast.offsetWidth;
+      toast.classList.add("show");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("show"), 3000);
+    }
+ 
+    function formatMoney(val) {
+      return "฿" + (Number(val) || 0).toLocaleString("th-TH", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+ 
+    function formatDateDisplay(val) {
+      if (!val) return "-";
+      const parts = String(val).split("-");
+      if (parts.length === 3) return parts[2] + "/" + parts[1] + "/" + parts[0];
+      return val;
+    }
+ 
+    function escapeHtml(val) {
+      return String(val == null ? "" : val).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+    }
+ 
+    function getErrorMessage(err) {
+      if (!err) return "เกิดข้อผิดพลาด";
+      return typeof err === "string" ? err : (err.message || "เกิดข้อผิดพลาด");
+    }
+  </script>
+</body>
+</html>
