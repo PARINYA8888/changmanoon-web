@@ -6,6 +6,9 @@
   <title>Apps Script API Bridge</title>
 </head>
 <body>
+<div id="bridgeStatus" style="font-family:Arial,sans-serif;padding:12px;font-size:14px">
+  Apps Script Bridge กำลังทำงาน...
+</div>
 <script>
 const ALLOWED_PARENT_ORIGIN = "https://parinya8888.github.io";
 
@@ -49,8 +52,6 @@ window.addEventListener("message", function(event) {
     return;
   }
 
-  const args = Array.isArray(msg.args) ? msg.args : [];
-
   try {
     const runner = google.script.run
       .withSuccessHandler(function(result) {
@@ -66,7 +67,10 @@ window.addEventListener("message", function(event) {
         );
       });
 
-    runner[msg.fn].apply(runner, args);
+    runner[msg.fn].apply(
+      runner,
+      Array.isArray(msg.args) ? msg.args : []
+    );
 
   } catch (err) {
     reply(
@@ -83,6 +87,9 @@ window.parent.postMessage({
   type: "bridge-ready",
   origin: location.origin
 }, ALLOWED_PARENT_ORIGIN);
+
+document.getElementById("bridgeStatus").textContent =
+  "Apps Script Bridge โหลดสำเร็จ";
 </script>
 </body>
 </html>
