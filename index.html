@@ -2712,22 +2712,26 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
       const box = document.getElementById("apiTestResult");
       const btn = document.querySelector(".api-test-btn");
       if (!box) return;
+
       if (btn) {
         btn.disabled = true;
-        btn.textContent = "กำลังทดสอบการเชื่อมต่อ...";
+        btn.textContent = "กำลังทดสอบ...";
       }
+
       box.className = "api-test-result show";
-      box.textContent = "กำลังติดต่อ Google Apps Script...";
- 
+      box.textContent = "ขั้นที่ 1/2: กำลังตรวจสอบว่า GitHub Pages ติดต่อ Apps Script ได้หรือไม่...";
+
       const callbackName = "__changmanoon_diagnostic_" + Date.now();
       const script = document.createElement("script");
       let finished = false;
       const startedAt = Date.now();
-      const cleanup = () => {
+
+      function cleanup() {
         if (script.parentNode) script.parentNode.removeChild(script);
         try { delete window[callbackName]; } catch (e) { window[callbackName] = undefined; }
-      };
-      const finish = (ok, message) => {
+      }
+
+      function finish(ok, message) {
         if (finished) return;
         finished = true;
         cleanup();
@@ -2737,13 +2741,15 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
         }
         box.className = "api-test-result show " + (ok ? "ok" : "bad");
         box.textContent = message;
-      };
- 
-      window[callbackName] = (payload) => {
+      }
+
+      window[callbackName] = function(payload) {
         const elapsed = Date.now() - startedAt;
+
         if (payload && payload.ok === true) {
           const data = payload.data;
           const count = Array.isArray(data) ? data.length : null;
+
           finish(true,
             "✅ เชื่อมต่อสำเร็จ\n" +
             "GitHub Pages → Apps Script: ผ่าน\n" +
@@ -2751,38 +2757,43 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
             (count !== null ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n" : "") +
             "ใช้เวลา: " + elapsed + " ms"
           );
-        } else {
-          finish(false,
-            "❌ Apps Script ตอบกลับเป็นข้อผิดพลาด\n" +
-            "รายละเอียด: " + ((payload && payload.error) || "ไม่ทราบสาเหตุ") + "\n" +
-            "ใช้เวลา: " + elapsed + " ms"
-          );
+          return;
         }
+
+        finish(false,
+          "❌ ติดต่อ Apps Script ได้ แต่ Apps Script ตอบ Error\n" +
+          "รายละเอียด: " + ((payload && payload.error) || "ไม่ทราบสาเหตุ") + "\n" +
+          "ใช้เวลา: " + elapsed + " ms"
+        );
       };
- 
-      script.onerror = () => finish(false,
-        "❌ โหลด API ไม่สำเร็จ\n" +
-        "เบราว์เซอร์ไม่สามารถเรียก Google Apps Script ได้\n" +
-        "URL: " + APPS_SCRIPT_WEB_APP_URL
-      );
- 
+
+      script.onerror = function() {
+        finish(false,
+          "❌ ขั้นที่ 1 ไม่ผ่าน\n" +
+          "GitHub Pages ไม่ได้รับคำตอบจาก Apps Script\n" +
+          "จึงยังไม่ถึงขั้นตรวจ Google Sheets"
+        );
+      };
+
       const params = new URLSearchParams();
       params.set("api", "1");
       params.set("fn", "getCustomers");
       params.set("args", "[]");
       params.set("prefix", callbackName);
+      params.set("_t", String(Date.now()));
+
       script.src = APPS_SCRIPT_WEB_APP_URL + "?" + params.toString();
       document.head.appendChild(script);
- 
-      setTimeout(() => {
+
+      setTimeout(function() {
         if (!finished) {
           finish(false,
-            "❌ หมดเวลารอคำตอบ (15 วินาที)\n" +
-            "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script\n" +
-            "ให้ส่งข้อความนี้กลับมาให้ผมตรวจต่อ"
+            "❌ ขั้นที่ 1 หมดเวลา 10 วินาที\n" +
+            "GitHub Pages ยังไม่ได้รับ JSONP callback จาก Apps Script\n" +
+            "ตอนนี้จุดที่ต้องตรวจคือการตอบกลับของ Web App/API"
           );
         }
-      }, 15000);
+      }, 10000);
     }
   </script>
 </body>
