@@ -25,15 +25,39 @@ function apiJson_(data, prefix) {
     .setMimeType(ContentService.MimeType.JSON);
 }
 
+var API_FUNCTIONS = {
+  getCustomers: getCustomers,
+  addCustomer: addCustomer,
+  updateCustomer: updateCustomer,
+  deleteCustomer: deleteCustomer,
+  processQuotation: processQuotation,
+  getQuotationHistory: getQuotationHistory,
+  getQuotationRecord: getQuotationRecord,
+  updateQuotationRecord: updateQuotationRecord,
+  deleteQuotation: deleteQuotation,
+  createQuotationPrintPdf: createQuotationPrintPdf,
+  getQuotationImages: getQuotationImages,
+  uploadQuotationImages: uploadQuotationImages,
+  deleteQuotationImage: deleteQuotationImage,
+  saveReceiptBatch: saveReceiptBatch,
+  getReceiptsData: getReceiptsData,
+  deleteReceiptRecord: deleteReceiptRecord,
+  updateReceiptRecord: updateReceiptRecord,
+  getReceiptImages: getReceiptImages,
+  uploadReceiptImages: uploadReceiptImages,
+  deleteReceiptImage: deleteReceiptImage,
+  calculateMaterialEstimate: calculateMaterialEstimate
+};
+
 function apiCallFunction_(fn, args) {
   if (!API_ALLOWED_FUNCTIONS.has(fn)) {
     throw new Error("ไม่อนุญาตให้เรียกฟังก์ชันนี้: " + fn);
   }
-  var target = this[fn];
+  var target = API_FUNCTIONS[fn];
   if (typeof target !== "function") {
     throw new Error("ไม่พบฟังก์ชัน: " + fn);
   }
-  return target.apply(this, Array.isArray(args) ? args : []);
+  return target.apply(null, Array.isArray(args) ? args : []);
 }
 
 function doGet(e) {
