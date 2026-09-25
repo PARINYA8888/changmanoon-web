@@ -1,21 +1,100 @@
-// เพิ่มใน Code.gs ของระบบเดิม — ไม่ต้องลบฟังก์ชันเดิม
-//
-// เปลี่ยน doGet() เดิมเป็น:
-function doGet(e) {
-  if (e && e.parameter && e.parameter.bridge === "1") {
-    return HtmlService.createHtmlOutputFromFile("ApiBridge")
-      .setTitle("Apps Script API Bridge")
-      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
-      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+// ============================================================
+// Apps Script API สำหรับ GitHub Pages
+// เพิ่มส่วนนี้ใน Code.gs เดิม และเปลี่ยน doGet(e) เป็นเวอร์ชันด้านล่าง
+// ============================================================
+
+const API_ALLOWED_FUNCTIONS = new Set([
+  "getCustomers","addCustomer","updateCustomer","deleteCustomer",
+  "processQuotation","getQuotationHistory","getQuotationRecord","updateQuotationRecord","deleteQuotation","createQuotationPrintPdf",
+  "getQuotationImages","uploadQuotationImages","deleteQuotationImage",
+  "saveReceiptBatch","getReceiptsData","deleteReceiptRecord","updateReceiptRecord",
+  "getReceiptImages","uploadReceiptImages","deleteReceiptImage",
+  "calculateMaterialEstimate"
+]);
+
+function apiJson_(data, prefix) {
+  var body = JSON.stringify(data === undefined ? null : data);
+  if (prefix) {
+    // prefix มาจาก client ที่สร้างเป็นชื่อ JavaScript identifier เอง
+    return ContentService
+      .createTextOutput(prefix + "(" + body + ")")
+      .setMimeType(ContentService.MimeType.JAVASCRIPT);
   }
-  return HtmlService.createHtmlOutputFromFile("Index")
+  return ContentService
+    .createTextOutput(body)
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function apiCallFunction_(fn, args) {
+  if (!API_ALLOWED_FUNCTIONS.has(fn)) {
+    throw new Error("ไม่อนุญาตให้เรียกฟังก์ชันนี้: " + fn);
+  }
+  var target = this[fn];
+  if (typeof target !== "function") {
+    throw new Error("ไม่พบฟังก์ชัน: " + fn);
+  }
+  return target.apply(this, Array.isArray(args) ? args : []);
+}
+
+function doGet(e) {
+  e = e || { parameter: {} };
+  var p = e.parameter || {};
+
+  // API สำหรับ GitHub Pages
+  if (p.api === "1") {
+    var fn = String(p.fn || "");
+    var prefix = String(p.prefix || "");
+
+    // prefix ใช้กับ JSONP เท่านั้น และต้องเป็น identifier ปกติ
+    if (prefix && !/^[A-Za-z_$][0-9A-Za-z_$]*$/.test(prefix)) {
+      return apiJson_({ ok:false, error:"invalid callback" }, "");
+    }
+
+    try {
+      var args = [];
+      if (p.args) {
+        args = JSON.parse(p.args);
+      }
+      var result = apiCallFunction_(fn, args);
+      return apiJson_({ ok:true, data:result }, prefix);
+    } catch (err) {
+      return apiJson_({
+        ok:false,
+        error: err && err.message ? err.message : String(err)
+      }, prefix);
+    }
+  }
+
+  // ไม่ใช่ API = เปิด Web App เดิมตามปกติ
+  return HtmlService
+    .createHtmlOutputFromFile("Index")
     .setTitle("ระบบโรงกลึงช่างมนูญบ่อทอง")
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
     .addMetaTag("viewport", "width=device-width, initial-scale=1");
 }
 
-// จากนั้นเพิ่มไฟล์ HTML ชื่อ ApiBridge.html ใน Apps Script project เดิม
-// แล้วนำเนื้อหาจากไฟล์ ApiBridge.html ใน repo นี้ไปใส่
-//
-// Deploy Web App ใหม่ แล้วนำ URL /exec ไปใส่ใน index.html
-// ตัวแปร APPS_SCRIPT_WEB_APP_URL
+function doPost(e) {
+  try {
+    var raw = e && e.postData && e.postData.contents ? e.postData.contents : "{}";
+    var req = JSON.parse(raw);
+    if (!req || req.api !== "1") {
+      return apiJson_({ ok:false, error:"invalid api request" });
+    }
+
+    var result = apiCallFunction_(String(req.fn || ""), req.args || []);
+    return apiJson_({ ok:true, data:result });
+  } catch (err) {
+    return apiJson_({
+      ok:false,
+      error: err && err.message ? err.message : String(err)
+    });
+  }
+}
+
+// ============================================================
+// หมายเหตุ
+// 1) ไม่ต้องลบฟังก์ชันเดิมของระบบ
+// 2) ไม่ต้องใช้ ApiBridge.html แล้วสำหรับ GitHub Pages
+// 3) Deploy Web App เวอร์ชันใหม่หลังแก้ Code.gs
+// 4) ต้องตั้ง Web app ให้ Execute as: Me และให้ผู้ใช้ที่ต้องใช้แอปเข้าถึงได้
+// ============================================================
