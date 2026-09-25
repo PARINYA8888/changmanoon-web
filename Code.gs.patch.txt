@@ -1,0 +1,21 @@
+// เพิ่มใน Code.gs ของระบบเดิม — ไม่ต้องลบฟังก์ชันเดิม
+//
+// เปลี่ยน doGet() เดิมเป็น:
+function doGet(e) {
+  if (e && e.parameter && e.parameter.bridge === "1") {
+    return HtmlService.createHtmlOutputFromFile("ApiBridge")
+      .setTitle("Apps Script API Bridge")
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+      .addMetaTag("viewport", "width=device-width, initial-scale=1");
+  }
+  return HtmlService.createHtmlOutputFromFile("Index")
+    .setTitle("ระบบโรงกลึงช่างมนูญบ่อทอง")
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL)
+    .addMetaTag("viewport", "width=device-width, initial-scale=1");
+}
+
+// จากนั้นเพิ่มไฟล์ HTML ชื่อ ApiBridge.html ใน Apps Script project เดิม
+// แล้วนำเนื้อหาจากไฟล์ ApiBridge.html ใน repo นี้ไปใส่
+//
+// Deploy Web App ใหม่ แล้วนำ URL /exec ไปใส่ใน index.html
+// ตัวแปร APPS_SCRIPT_WEB_APP_URL
