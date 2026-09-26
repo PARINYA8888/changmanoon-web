@@ -811,209 +811,10 @@ input, select, textarea {
   <div id="toast" class="toast"></div>
  
   <script>
-window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYAVEGxe6q1D5xmBmaQkHbCT3qoAbulWBNv2uFgLKeY6G5wCNqf2-qPwF4RG9NgRQ/exec";
+// หน้าเว็บนี้จะถูกรันจาก Apps Script Web App โดยตรง
+// จึงใช้ google.script.run ของ Apps Script ได้โดยตรง
+// ไม่ต้องมี iframe Bridge และไม่ต้องสร้าง window.google.script.run เอง
 
-/*
- * GitHub Pages -> Apps Script bridge
- *
- * ไม่ใช้ JSONP / fetch CORS แล้ว
- * GitHub Pages จะฝัง ApiBridge.html ของ Apps Script แบบ hidden iframe
- * แล้วสื่อสารด้วย postMessage
- *
- * ข้อดี:
- * - google.script.run ทำงานอยู่ใน HTML Service ของ Apps Script โดยตรง
- * - รองรับทั้งอ่าน/เขียน/อัปโหลดรูป/PDF
- * - ไม่ต้องพึ่ง CORS หรือ JSONP
- * - โค้ดฝั่ง server เดิมไม่ต้องเปลี่ยนวิธีทำงาน
- */
-(function initAppsScriptApi(){
-  let seq = 0;
-  let bridgeReady = false;
-  let bridgeLoadStarted = false;
-  const pending = new Map();
-  const bridgeQueue = [];
-
-  function apiUrl(){
-    return window.APPS_SCRIPT_WEB_APP_URL;
-  }
-
-  function ensureBridge(){
-    if (bridgeLoadStarted) return;
-    bridgeLoadStarted = true;
-
-    const iframe = document.createElement("iframe");
-    iframe.id = "appsScriptApiBridge";
-    iframe.title = "Apps Script API Bridge";
-    iframe.setAttribute("aria-hidden","true");
-    iframe.style.position = "fixed";
-    iframe.style.width = "1px";
-    iframe.style.height = "1px";
-    iframe.style.border = "0";
-    iframe.style.opacity = "0";
-    iframe.style.pointerEvents = "none";
-    iframe.style.left = "-10px";
-    iframe.style.top = "-10px";
-
-    iframe.onload = function(){
-      try{
-        iframe.contentWindow.postMessage(
-          { type:"bridge-ping" },
-          "*"
-        );
-      }catch(e){}
-    };
-
-    document.body.appendChild(iframe);
-    iframe.src = apiUrl() + "?bridge=1&v=" + Date.now();
-  }
-
-  function sendCall(item){
-    if(!bridgeReady){
-      bridgeQueue.push(item);
-      ensureBridge();
-      return;
-    }
-
-    const iframe = document.getElementById("appsScriptApiBridge");
-    if(!iframe || !iframe.contentWindow){
-      if(typeof item.failure === "function"){
-        item.failure(new Error("Apps Script Bridge ยังไม่พร้อม"), item.userObject);
-      }
-      return;
-    }
-
-    pending.set(item.id,item);
-
-    try{
-      iframe.contentWindow.postMessage(
-        {
-          type:"bridge-call",
-          id:item.id,
-          fn:item.fn,
-          args:item.args
-        },
-        "*"
-      );
-    }catch(err){
-      pending.delete(item.id);
-      if(typeof item.failure === "function"){
-        item.failure(err,item.userObject);
-      }
-    }
-
-    setTimeout(function(){
-      const current = pending.get(item.id);
-      if(!current) return;
-      pending.delete(item.id);
-      if(typeof current.failure === "function"){
-        current.failure(
-          new Error("Google Apps Script API ใช้เวลานานเกินไป"),
-          current.userObject
-        );
-      }
-    },60000);
-  }
-
-  window.addEventListener("message",function(event){
-    const iframe = document.getElementById("appsScriptApiBridge");
-
-    if(event.source !== (iframe && iframe.contentWindow)){
-      return;
-    }
-
-    const msg = event.data || {};
-
-    if(msg.type === "bridge-ready"){
-      bridgeReady = true;
-
-      while(bridgeQueue.length){
-        sendCall(bridgeQueue.shift());
-      }
-      return;
-    }
-
-    if(msg.type !== "bridge-result" || !msg.id){
-      return;
-    }
-
-    const item = pending.get(msg.id);
-    if(!item) return;
-
-    pending.delete(msg.id);
-
-    if(msg.ok){
-      if(typeof item.success === "function"){
-        try{
-          item.success(msg.data,item.userObject);
-        }catch(e){
-          setTimeout(function(){ throw e; },0);
-        }
-      }
-    }else if(typeof item.failure === "function"){
-      item.failure(
-        new Error(msg.error || "เกิดข้อผิดพลาดจาก Apps Script"),
-        item.userObject
-      );
-    }
-  });
-
-  function callServer(fn,args,success,failure,userObject){
-    const item = {
-      id:"call_" + Date.now() + "_" + (++seq),
-      fn:fn,
-      args:Array.isArray(args) ? args : [],
-      success:success,
-      failure:failure,
-      userObject:userObject
-    };
-
-    sendCall(item);
-  }
-
-  function makeRunner(success,failure,userObject){
-    return new Proxy({},{
-      get:function(_target,prop){
-        if(prop === "withSuccessHandler"){
-          return function(fn){
-            return makeRunner(fn,failure,userObject);
-          };
-        }
-
-        if(prop === "withFailureHandler"){
-          return function(fn){
-            return makeRunner(success,fn,userObject);
-          };
-        }
-
-        if(prop === "withUserObject"){
-          return function(obj){
-            return makeRunner(success,failure,obj);
-          };
-        }
-
-        if(typeof prop !== "string"){
-          return undefined;
-        }
-
-        return function(){
-          callServer(
-            prop,
-            Array.from(arguments),
-            success,
-            failure,
-            userObject
-          );
-        };
-      }
-    });
-  }
-
-  window.google = window.google || {};
-  window.google.script = window.google.script || {};
-  window.google.script.run = makeRunner(null,null,null);
-
-  ensureBridge();
-})();
 
 </script>
   <script>
@@ -2817,7 +2618,7 @@ window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjY
       }
 
       box.className = "api-test-result show";
-      box.textContent = "กำลังทดสอบ GitHub Pages → Apps Script Bridge...";
+      box.textContent = "กำลังทดสอบ Apps Script → Google Sheets...";
 
       let finished = false;
       const startedAt = Date.now();
@@ -2845,7 +2646,7 @@ window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjY
 
             finish(true,
               "✅ เชื่อมต่อสำเร็จ\n" +
-              "GitHub Pages → Apps Script Bridge: ผ่าน\n" +
+              "Apps Script → Google Sheets: ผ่าน\n" +
               "Apps Script → Google Sheets: ผ่าน\n" +
               (count !== null
                 ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n"
