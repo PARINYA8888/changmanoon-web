@@ -811,7 +811,7 @@ input, select, textarea {
   <div id="toast" class="toast"></div>
  
   <script>
-const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYAVEGxe6q1D5xmBmaQkHbCT3qoAbulWBNv2uFgLKeY6G5wCNqf2-qPwF4RG9NgRQ/exec";
+window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYAVEGxe6q1D5xmBmaQkHbCT3qoAbulWBNv2uFgLKeY6G5wCNqf2-qPwF4RG9NgRQ/exec";
 
 /*
  * GitHub Pages -> Apps Script bridge
@@ -831,7 +831,7 @@ const APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjYA
   const pending = new Map();
 
   function apiUrl(){
-    return APPS_SCRIPT_WEB_APP_URL;
+    return window.APPS_SCRIPT_WEB_APP_URL;
   }
 
   function jsonpCall(fn,args,success,failure,userObject){
@@ -2990,7 +2990,7 @@ initAppsScriptApi();
         params.set("prefix", cbName);
 
         script.src =
-          APPS_SCRIPT_WEB_APP_URL +
+          window.APPS_SCRIPT_WEB_APP_URL +
           "?" +
           params.toString();
 
