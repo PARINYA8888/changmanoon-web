@@ -28,7 +28,7 @@ function reply(target, id, ok, data, error) {
     ok: ok,
     data: ok ? data : undefined,
     error: ok ? undefined : String(error || "เกิดข้อผิดพลาดจากเซิร์ฟเวอร์")
-  }, ALLOWED_PARENT_ORIGIN);
+  }, "*");
 }
 
 window.addEventListener("message", function(event) {
@@ -41,7 +41,7 @@ window.addEventListener("message", function(event) {
     event.source.postMessage({
       type: "bridge-ready",
       origin: location.origin
-    }, ALLOWED_PARENT_ORIGIN);
+    }, "*");
     return;
   }
 
@@ -86,7 +86,7 @@ window.addEventListener("message", function(event) {
 window.parent.postMessage({
   type: "bridge-ready",
   origin: location.origin
-}, ALLOWED_PARENT_ORIGIN);
+}, "*");
 
 document.getElementById("bridgeStatus").textContent =
   "Apps Script Bridge โหลดสำเร็จ";
