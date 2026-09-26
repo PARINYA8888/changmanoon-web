@@ -331,10 +331,10 @@ input, select, textarea {
           </div>
           <div>
             <div class="api-test-title">ตรวจสอบการเชื่อมต่อ Google Sheets</div>
-            <div class="api-test-sub">ทดสอบจาก GitHub Pages → Google Apps Script → Google Sheets โดยตรง</div>
+            <div class="api-test-sub">ทดสอบ Apps Script → Google Sheets โดยตรง</div>
           </div>
         </div>
-        <button type="button" class="api-test-btn" onclick="testBackendConnection()">กดเพื่อทดสอบการเชื่อมต่อ</button>
+        <button type="button" class="api-test-btn" onclick="testBackendConnection()">ทดสอบการเชื่อมต่อ</button>
         <div id="apiTestResult" class="api-test-result"></div>
       </div>
  
@@ -2605,8 +2605,8 @@ input, select, textarea {
     }
 
  
-    // ทดสอบ API โดยตรงจาก GitHub Pages โดยไม่ผ่าน google.script.run
-    // ใช้ getCustomers เป็น read-only test เพื่อไม่แก้ไขข้อมูลในระบบ
+    // ทดสอบการเชื่อมต่อ Apps Script → Google Sheets โดยตรง
+    // หน้าเว็บนี้รันอยู่ภายใน Apps Script HTML Service
     function testBackendConnection() {
       const box = document.getElementById("apiTestResult");
       const btn = document.querySelector(".api-test-btn");
@@ -2620,23 +2620,7 @@ input, select, textarea {
       box.className = "api-test-result show";
       box.textContent = "กำลังทดสอบ Apps Script → Google Sheets...";
 
-      let finished = false;
       const startedAt = Date.now();
-
-      function finish(ok, message) {
-        if (finished) return;
-        finished = true;
-
-        if (btn) {
-          btn.disabled = false;
-          btn.textContent = "ทดสอบอีกครั้ง";
-        }
-
-        box.className =
-          "api-test-result show " + (ok ? "ok" : "bad");
-
-        box.textContent = message;
-      }
 
       try {
         google.script.run
@@ -2644,43 +2628,49 @@ input, select, textarea {
             const elapsed = Date.now() - startedAt;
             const count = Array.isArray(data) ? data.length : null;
 
-            finish(true,
-              "✅ เชื่อมต่อสำเร็จ\n" +
-              "Apps Script → Google Sheets: ผ่าน\n" +
-              "Apps Script → Google Sheets: ผ่าน\n" +
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = "ทดสอบอีกครั้ง";
+            }
+
+            box.className = "api-test-result show ok";
+            box.textContent =
+              "✅ เชื่อมต่อสำเร็จ\\n" +
+              "Apps Script → Google Sheets: ผ่าน\\n" +
               (count !== null
-                ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n"
+                ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\\n"
                 : "") +
-              "ใช้เวลา: " + elapsed + " ms"
-            );
+              "ใช้เวลา: " + elapsed + " ms";
           })
           .withFailureHandler(function(err) {
             const elapsed = Date.now() - startedAt;
 
-            finish(false,
-              "❌ Apps Script API ตอบกลับ Error\n" +
-              "รายละเอียด: " + getErrorMessage(err) +
-              "\nใช้เวลา: " + elapsed + " ms"
-            );
+            if (btn) {
+              btn.disabled = false;
+              btn.textContent = "ทดสอบอีกครั้ง";
+            }
+
+            box.className = "api-test-result show bad";
+            box.textContent =
+              "❌ Apps Script ตอบกลับ Error\\n" +
+              "รายละเอียด: " + getErrorMessage(err) + "\\n" +
+              "ใช้เวลา: " + elapsed + " ms";
           })
           .getCustomers();
 
-        setTimeout(function() {
-          if (!finished) {
-            finish(false,
-              "❌ หมดเวลา 15 วินาที\n" +
-              "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script Bridge"
-            );
-          }
-        },15000);
-
       } catch (err) {
-        finish(false,
-          "❌ เริ่มทดสอบ API ไม่สำเร็จ\n" +
-          "รายละเอียด: " + getErrorMessage(err)
-        );
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = "ทดสอบอีกครั้ง";
+        }
+
+        box.className = "api-test-result show bad";
+        box.textContent =
+          "❌ เริ่มทดสอบไม่ได้\\n" +
+          "รายละเอียด: " + getErrorMessage(err);
       }
     }
+
   </script>
 </body>
 </html>
