@@ -811,6 +811,13 @@ input, select, textarea {
   <div id="toast" class="toast"></div>
  
   <script>
+    window.addEventListener("error", function(e) {
+      console.error("JS ERROR:", e.error || e.message);
+    });
+    window.addEventListener("unhandledrejection", function(e) {
+      console.error("PROMISE ERROR:", e.reason);
+    });
+
 // หน้าเว็บนี้จะถูกรันจาก Apps Script Web App โดยตรง
 // จึงใช้ google.script.run ของ Apps Script ได้โดยตรง
 // ไม่ต้องมี iframe Bridge และไม่ต้องสร้าง window.google.script.run เอง
@@ -2606,7 +2613,6 @@ input, select, textarea {
 
  
     // ทดสอบการเชื่อมต่อ Apps Script → Google Sheets โดยตรง
-    // หน้าเว็บนี้รันอยู่ภายใน Apps Script HTML Service
     function testBackendConnection() {
       const box = document.getElementById("apiTestResult");
       const btn = document.querySelector(".api-test-btn");
@@ -2616,60 +2622,52 @@ input, select, textarea {
         btn.disabled = true;
         btn.textContent = "กำลังทดสอบ...";
       }
-
       box.className = "api-test-result show";
       box.textContent = "กำลังทดสอบ Apps Script → Google Sheets...";
 
-      const startedAt = Date.now();
-
-      try {
-        google.script.run
-          .withSuccessHandler(function(data) {
-            const elapsed = Date.now() - startedAt;
-            const count = Array.isArray(data) ? data.length : null;
-
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = "ทดสอบอีกครั้ง";
-            }
-
-            box.className = "api-test-result show ok";
-            box.textContent =
-              "✅ เชื่อมต่อสำเร็จ\\n" +
-              "Apps Script → Google Sheets: ผ่าน\\n" +
-              (count !== null
-                ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\\n"
-                : "") +
-              "ใช้เวลา: " + elapsed + " ms";
-          })
-          .withFailureHandler(function(err) {
-            const elapsed = Date.now() - startedAt;
-
-            if (btn) {
-              btn.disabled = false;
-              btn.textContent = "ทดสอบอีกครั้ง";
-            }
-
-            box.className = "api-test-result show bad";
-            box.textContent =
-              "❌ Apps Script ตอบกลับ Error\\n" +
-              "รายละเอียด: " + getErrorMessage(err) + "\\n" +
-              "ใช้เวลา: " + elapsed + " ms";
-          })
-          .getCustomers();
-
-      } catch (err) {
+      const finish = (ok, message) => {
         if (btn) {
           btn.disabled = false;
           btn.textContent = "ทดสอบอีกครั้ง";
         }
+        box.className = "api-test-result show " + (ok ? "ok" : "bad");
+        box.textContent = message;
+      };
 
-        box.className = "api-test-result show bad";
-        box.textContent =
-          "❌ เริ่มทดสอบไม่ได้\\n" +
-          "รายละเอียด: " + getErrorMessage(err);
+      if (!window.google || !window.google.script || !window.google.script.run) {
+        finish(false,
+          "❌ หน้านี้ไม่ได้รันผ่าน Apps Script Web App\n" +
+          "กรุณาเปิด URL /exec ของ Apps Script"
+        );
+        return;
+      }
+
+      try {
+        google.script.run
+          .withSuccessHandler(function(data) {
+            finish(true,
+              "✅ เชื่อมต่อสำเร็จ\n" +
+              "Apps Script → Google Sheets: ผ่าน\n" +
+              "ข้อมูลลูกค้าที่อ่านได้: " +
+              (Array.isArray(data) ? data.length : 0) + " รายการ"
+            );
+          })
+          .withFailureHandler(function(err) {
+            finish(false,
+              "❌ Apps Script ตอบกลับ Error\n" +
+              "รายละเอียด: " + getErrorMessage(err)
+            );
+          })
+          .getCustomers();
+      } catch (err) {
+        finish(false,
+          "❌ เริ่มทดสอบไม่ได้\n" +
+          "รายละเอียด: " + getErrorMessage(err)
+        );
       }
     }
+
+    window.testBackendConnection = testBackendConnection;
 
   </script>
 </body>
