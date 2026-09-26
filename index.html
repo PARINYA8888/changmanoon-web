@@ -858,7 +858,7 @@ window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjY
       try{
         iframe.contentWindow.postMessage(
           { type:"bridge-ping" },
-          "https://parinya8888.github.io"
+          "*"
         );
       }catch(e){}
     };
@@ -892,7 +892,7 @@ window.APPS_SCRIPT_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzrJjY
           fn:item.fn,
           args:item.args
         },
-        "https://parinya8888.github.io"
+        "*"
       );
     }catch(err){
       pending.delete(item.id);
