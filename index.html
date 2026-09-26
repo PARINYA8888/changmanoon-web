@@ -2895,7 +2895,7 @@ initAppsScriptApi();
       }
 
       box.className = "api-test-result show";
-      box.textContent = "ขั้นที่ 1/2: กำลังตรวจสอบ GitHub Pages → Apps Script Bridge...";
+      box.textContent = "กำลังทดสอบ GitHub Pages → Apps Script API...";
 
       let finished = false;
       const startedAt = Date.now();
@@ -2903,52 +2903,116 @@ initAppsScriptApi();
       function finish(ok, message) {
         if (finished) return;
         finished = true;
+
         if (btn) {
           btn.disabled = false;
           btn.textContent = "ทดสอบอีกครั้ง";
         }
-        box.className = "api-test-result show " + (ok ? "ok" : "bad");
+
+        box.className =
+          "api-test-result show " + (ok ? "ok" : "bad");
+
         box.textContent = message;
       }
 
       try {
-        google.script.run
-          .withSuccessHandler(function(data) {
-            const elapsed = Date.now() - startedAt;
-            const count = Array.isArray(data) ? data.length : null;
+        const cbName =
+          "__diagnostic_cb_" +
+          Date.now() +
+          "_" +
+          Math.random().toString(36).slice(2);
 
-            finish(true,
-              "✅ เชื่อมต่อสำเร็จ\n" +
-              "GitHub Pages → Apps Script Bridge: ผ่าน\n" +
-              "Apps Script → Google Sheets: ผ่าน\n" +
-              (count !== null ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n" : "") +
-              "ใช้เวลา: " + elapsed + " ms"
-            );
-          })
-          .withFailureHandler(function(err) {
-            const elapsed = Date.now() - startedAt;
+        const script = document.createElement("script");
+        let cleaned = false;
+
+        function cleanup() {
+          if (cleaned) return;
+          cleaned = true;
+
+          try {
+            delete window[cbName];
+          } catch (e) {
+            window[cbName] = undefined;
+          }
+
+          if (script.parentNode) {
+            script.parentNode.removeChild(script);
+          }
+        }
+
+        window[cbName] = function(payload) {
+          cleanup();
+
+          const elapsed = Date.now() - startedAt;
+
+          if (!payload || payload.ok !== true) {
             finish(false,
-              "❌ Bridge ติดต่อ Apps Script ได้ แต่ฟังก์ชันตอบ Error\n" +
-              "รายละเอียด: " + getErrorMessage(err) + "\n" +
-              "ใช้เวลา: " + elapsed + " ms"
+              "❌ Apps Script API ตอบกลับ Error\n" +
+              "รายละเอียด: " +
+              (payload && payload.error
+                ? payload.error
+                : "ไม่ทราบข้อผิดพลาด") +
+              "\nใช้เวลา: " + elapsed + " ms"
             );
-          })
-          .getCustomers();
-      } catch(err) {
+            return;
+          }
+
+          const data = payload.data;
+          const count = Array.isArray(data)
+            ? data.length
+            : null;
+
+          finish(true,
+            "✅ เชื่อมต่อสำเร็จ\n" +
+            "GitHub Pages → Apps Script API: ผ่าน\n" +
+            "Apps Script → Google Sheets: ผ่าน\n" +
+            (count !== null
+              ? "ข้อมูลลูกค้าที่อ่านได้: " + count + " รายการ\n"
+              : "") +
+            "ใช้เวลา: " + elapsed + " ms"
+          );
+        };
+
+        script.onerror = function() {
+          cleanup();
+
+          finish(false,
+            "❌ GitHub Pages โหลด Apps Script API ไม่สำเร็จ\n" +
+            "ตรวจสอบการเข้าถึง Web App /exec"
+          );
+        };
+
+        const params = new URLSearchParams();
+
+        params.set("api", "1");
+        params.set("fn", "getCustomers");
+        params.set("args", "[]");
+        params.set("prefix", cbName);
+
+        script.src =
+          APPS_SCRIPT_WEB_APP_URL +
+          "?" +
+          params.toString();
+
+        document.head.appendChild(script);
+
+        setTimeout(function() {
+          if (!cleaned) {
+            cleanup();
+
+            finish(false,
+              "❌ หมดเวลา 10 วินาที\n" +
+              "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script API"
+            );
+          }
+        }, 10000);
+
+      } catch (err) {
         finish(false,
-          "❌ เริ่ม Apps Script Bridge ไม่สำเร็จ\n" +
+          "❌ เริ่มทดสอบ API ไม่สำเร็จ\n" +
           "รายละเอียด: " + getErrorMessage(err)
         );
       }
-
-      setTimeout(function() {
-        if (!finished) {
-          finish(false,
-            "❌ หมดเวลา 10 วินาที\n" +
-            "GitHub Pages ยังไม่ได้รับคำตอบจาก Apps Script Bridge"
-          );
-        }
-      }, 10000);
     }
   </script>
 </body>
